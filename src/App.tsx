@@ -128,6 +128,14 @@ export default function App() {
     localStorage.setItem('paletik_senderDetails', senderDetails);
   }, [senderDetails]);
 
+  // Clave API de Gemini y visibilidad de ajustes
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(() => localStorage.getItem('paletik_gemini_api_key') || '');
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+
+  useEffect(() => {
+    localStorage.setItem('paletik_gemini_api_key', geminiApiKey);
+  }, [geminiApiKey]);
+
   // Módulo de Albaranes - Transportes
   const [transports, setTransports] = useState<Transport[]>([]);
 
@@ -173,11 +181,16 @@ export default function App() {
 
     try {
       const base64Data = await arrayBufferToBase64(activePdf);
+      const reqHeaders: Record<string, string> = {
+        "Content-Type": "application/json"
+      };
+      if (geminiApiKey.trim()) {
+        reqHeaders["x-gemini-api-key"] = geminiApiKey.trim();
+      }
+
       const response = await fetch("/api/parse-pdf", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: reqHeaders,
         body: JSON.stringify({ pdfBase64: base64Data })
       });
 
@@ -1200,6 +1213,18 @@ export default function App() {
           </div>
           <div className="flex gap-2">
             <button 
+              onClick={() => setShowSettings(!showSettings)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all flex items-center gap-2 ${
+                showSettings 
+                  ? 'border-rose-500 bg-rose-500/10 text-white font-semibold' 
+                  : 'border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-300'
+              }`}
+              title="Configurar clave de la API de Gemini para la extracción con IA"
+            >
+              <Settings className={`w-3.5 h-3.5 ${showSettings ? 'rotate-45' : ''} transition-transform`} />
+              Configurar API Key
+            </button>
+            <button 
               onClick={() => setShowFormulaExplanation(!showFormulaExplanation)}
               className="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-300 transition-all flex items-center gap-2.5"
             >
@@ -1216,6 +1241,45 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* API Key settings panel */}
+      {showSettings && (
+        <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-3 animate-fade-in">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                <BrainCircuit className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
+                Configurar API de Gemini (AI Studio)
+              </h3>
+              <p className="text-[11px] text-zinc-400 mt-0.5">
+                Ingresa tu clave de API de Gemini para realizar el análisis de albaranes PDF de manera gratuita. Se guarda de forma local en tu navegador.
+              </p>
+            </div>
+            <div className="w-full sm:w-auto flex items-center gap-2">
+              <input
+                type="password"
+                value={geminiApiKey}
+                onChange={(e) => setGeminiApiKey(e.target.value)}
+                placeholder="Clave API (AI Studio)..."
+                className="w-full sm:w-80 bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-rose-500 font-mono"
+              />
+              {geminiApiKey ? (
+                <button
+                  onClick={() => {
+                    setGeminiApiKey('');
+                    setSuccessMsg('API Key eliminada. El servidor usará la clave predeterminada.');
+                  }}
+                  className="px-2.5 py-1.5 text-xs font-semibold text-rose-400 bg-rose-950/20 hover:bg-rose-950/40 rounded transition border border-rose-900/30 whitespace-nowrap"
+                >
+                  Limpiar
+                </button>
+              ) : (
+                <span className="text-[10px] text-amber-500 whitespace-nowrap">Usando clave de servidor (si existe)</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tab Switcher */}
       <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-2.5">

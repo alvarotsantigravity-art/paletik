@@ -56,10 +56,31 @@ app.post("/api/parse-pdf", async (req, res) => {
       return res.status(400).json({ error: "No se ha proporcionado el contenido base64 del PDF." });
     }
 
+    const clientApiKey = req.headers["x-gemini-api-key"] || process.env.GEMINI_API_KEY;
+    if (!clientApiKey) {
+      return res.status(401).json({ error: "No se ha proporcionado una clave API de Gemini. Configúrala en la interfaz o en las variables de entorno." });
+    }
+
+    const keyStr = String(clientApiKey).trim();
+    const maskedKey = keyStr.length > 8 
+      ? `${keyStr.substring(0, 4)}...${keyStr.substring(keyStr.length - 4)}` 
+      : '***';
+    const keySource = req.headers["x-gemini-api-key"] ? 'Cabecera del Cliente' : 'Env del Servidor';
+    console.log(`[Parse PDF] Utilizando clave API Gemini: ${maskedKey} (Origen: ${keySource})`);
+
     // Strip raw data scheme URI prefix if any
     const cleanBase64 = pdfBase64.replace(/^data:application\/pdf;base64,/, "");
 
-    const response = await ai.models.generateContent({
+    const requestAi = new GoogleGenAI({
+      apiKey: String(clientApiKey),
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+
+    const response = await requestAi.models.generateContent({
       model: "gemini-2.0-flash",
       contents: [
         {
@@ -128,7 +149,11 @@ app.post("/api/parse-pdf", async (req, res) => {
     return res.json({ success: true, count: data.length, data });
   } catch (error: any) {
     console.error("Error parsing labels PDF via Gemini API:", error);
-    return res.status(500).json({ error: error?.message || "Error procesando el PDF por IA." });
+    const keySource = req.headers["x-gemini-api-key"] ? 'la interfaz del navegador (Client Header)' : 'las variables del servidor (Server Env)';
+    const errMsg = error?.message || JSON.stringify(error);
+    return res.status(500).json({ 
+      error: `Error de análisis por IA (Clave usada de: ${keySource}): ${errMsg}. Por favor, comprueba que tu API Key sea válida, activa y con cuota de uso en Google AI Studio.`
+    });
   }
 });
 
