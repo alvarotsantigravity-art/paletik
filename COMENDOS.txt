@@ -1,0 +1,15 @@
+# Comandos de referencia para el proyecto PALETIK en Google Cloud Run
+#
+# GCP Project: project-a4c37168-06b1-45b0-a47
+# Cloud Run Service: paletik-app  |  Region: europe-west1
+#
+# IAM roles necesarios (ya configurados):
+# gcloud projects add-iam-policy-binding project-a4c37168-06b1-45b0-a47 --member="serviceAccount:947255210238-compute@developer.gserviceaccount.com" --role="roles/storage.objectViewer"
+# gcloud projects add-iam-policy-binding project-a4c37168-06b1-45b0-a47 --member="serviceAccount:947255210238-compute@developer.gserviceaccount.com" --role="roles/logging.logWriter"
+# gcloud projects add-iam-policy-binding project-a4c37168-06b1-45b0-a47 --member="serviceAccount:947255210238-compute@developer.gserviceaccount.com" --role="roles/artifactregistry.writer"
+
+# Actualizar variables de entorno en el servicio:
+# gcloud run services update paletik-app --set-env-vars="GEMINI_API_KEY=<TU_CLAVE>,NODE_ENV=production" --region=europe-west1
+
+# Desplegar la aplicación directamente desde el código fuente local:
+# gcloud run deploy paletik-app --source . --region=europe-west1 --project=project-a4c37168-06b1-45b0-a47

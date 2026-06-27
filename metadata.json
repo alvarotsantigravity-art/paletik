@@ -1,0 +1,6 @@
+{
+  "name": "Gestor de Paletizado",
+  "description": "Optimiza palets para distribución de folletos, duplica páginas de etiquetas PDF y añade marcas de paletizado en la posición central e inferior de las páginas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
