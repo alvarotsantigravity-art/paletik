@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
+import * as XLSX from 'xlsx';
 import {
   Package,
   Layers,
@@ -1012,7 +1013,6 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
 
   // ── Export CSV/Excel data ──
   const handleExportExcel = useCallback(async () => {
-    const XLSX = await import('xlsx');
     const data = [
       ['CUBICAJE DE FOLLETOS EN PALET — Informe'],
       [],

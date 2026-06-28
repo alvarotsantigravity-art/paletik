@@ -176,7 +176,7 @@ export default function App() {
     }
 
     setIsAnalyzingPdf(true);
-    setSuccessMsg(`Iniciando análisis logístico de ${activeTab === 'etiquetas' ? 'etiquetas' : 'albaranes'} mediante IA... Por favor espere.`);
+    setSuccessMsg(`Iniciando análisis del PDF de ${activeTab === 'etiquetas' ? 'etiquetas' : 'albaranes'} (procesamiento local gratuito)... Por favor espere.`);
     setErrorMsg("");
 
     try {
@@ -214,7 +214,7 @@ export default function App() {
 
         setDistributionList(parsedItems);
         setSelectedPreviewItemIdx(0);
-        setSuccessMsg(`¡Análisis Exitoso! Se han extraído e inyectado secuencialmente ${parsedItems.length} partidas de distribución desde el PDF de etiquetas.`);
+        setSuccessMsg(`¡Sincronización Exitosa! Se han extraído e inyectado ${parsedItems.length} partidas de distribución desde el PDF.`);
       } else {
         throw new Error("El formato de respuesta de la IA es inesperado.");
       }
@@ -573,7 +573,6 @@ export default function App() {
   };
 
   const buildOriginalPdfBytes = async (itemsToCreate: DistributionItem[]) => {
-    const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
     const pdfDoc = await PDFDocument.create();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -689,7 +688,6 @@ export default function App() {
   };
 
   const buildAlbaranPdfBytes = async (transportsList: Transport[], dList: DistributionItem[]) => {
-    const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
     const pdfDoc = await PDFDocument.create();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -843,7 +841,6 @@ export default function App() {
     setIsProcessingPdf(true);
     setPdfProgress(10);
     try {
-      const { PDFDocument } = await import('pdf-lib');
       const activePdfBytes = activeTab === 'etiquetas' ? pdfFileBytes : albaranesPdfFileBytes;
       const activePdfName = activeTab === 'etiquetas' ? pdfFileName : albaranesPdfFileName;
       const isUsingCustomBase = !!(activePdfBytes && !activePdfName.includes('Original.pdf'));
@@ -912,7 +909,6 @@ export default function App() {
 
       let pdfBytesBase;
       if (uploadedPdfBytes && !fileName.includes('Original.pdf')) {
-        const { PDFDocument } = await import('pdf-lib');
         const srcPdfDoc = await PDFDocument.load(uploadedPdfBytes);
         const previewDoc = await PDFDocument.create();
         const pageIdx = (selectedPreviewItemIdx || 0) % srcPdfDoc.getPageCount();
@@ -1876,7 +1872,7 @@ export default function App() {
                     <BrainCircuit className={`w-5 h-5 text-emerald-400 shrink-0 ${isAnalyzingPdf ? 'animate-pulse text-rose-500' : ''}`} />
                     <div className="text-left font-sans">
                       <p className="text-xs font-semibold text-zinc-200">PDF cargado: <span className="font-mono text-emerald-400 text-[11px]">{activeTab === 'etiquetas' ? pdfFileName : albaranesPdfFileName}</span></p>
-                      <p className="text-[10px] text-zinc-400">¿Quieres sincronizar el listado de distribución extrayendo versión, dirección y tirada de cada página del PDF con IA?</p>
+                      <p className="text-[10px] text-zinc-400">¿Quieres extraer la versión, dirección y tirada de cada página del PDF de forma local, instantánea y gratuita?</p>
                     </div>
                   </div>
                   <button
@@ -1892,7 +1888,7 @@ export default function App() {
                     ) : (
                       <>
                         <BrainCircuit className="w-3.5 h-3.5" />
-                        Sincronizar con IA
+                        Sincronizar PDF
                       </>
                     )}
                   </button>

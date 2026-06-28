@@ -10,6 +10,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
+import * as pdf from "pdf-parse";
 
 dotenv.config();
 
@@ -49,6 +50,81 @@ const ai = new GoogleGenAI({
 /**
  * Endpoint to parse delivery labels from uploaded PDF multi-page doc
  */
+/**
+ * Helper to parse page text using regex heuristics.
+ * Supports the 3 main types of delivery labels in the project.
+ */
+function parsePageText(text: string): { version: string; address: string; quantity: number } {
+  // Clean up whitespace
+  const cleanText = text.replace(/\s+/g, ' ').trim();
+
+  // 1. Find quantity: looking for digits followed by "ej" (case-insensitive)
+  const qtyMatch = cleanText.match(/(\d+)\s*ej/i);
+  if (!qtyMatch) {
+    return {
+      version: 'Desconocido',
+      address: cleanText,
+      quantity: 0
+    };
+  }
+
+  const quantity = parseInt(qtyMatch[1], 10);
+  const qtyString = qtyMatch[0]; // e.g. "21865 ej" or "25 ej"
+
+  // 2. Split the text into before and after the quantity
+  const qtyIndex = cleanText.indexOf(qtyString);
+  const textBefore = cleanText.substring(0, qtyIndex).trim();
+  const textAfter = cleanText.substring(qtyIndex + qtyString.length).trim();
+
+  let version = 'Estándar';
+  let address = '';
+
+  // 3. Determine Template Type & Extract Version and Address
+  const entregaMatch = cleanText.match(/Entrega en\s*:\s*(.*)/i);
+  if (entregaMatch) {
+    address = entregaMatch[1].trim();
+    const versionMatch = textBefore.match(/([^-–]+)\s*[-–]\s*$/);
+    if (versionMatch) {
+      version = versionMatch[1].trim();
+    } else {
+      const segments = textBefore.split(/[-–]/);
+      version = segments[segments.length - 1]?.trim() || 'Estándar';
+    }
+  } else {
+    const knownVersions = ['ahorramás', 'catalán', 'galicia', 'euskera', 'estándar', 'castellano', 'atracción'];
+    const firstWordAfter = textAfter.split(' ')[0]?.trim() || '';
+    
+    if (knownVersions.includes(firstWordAfter.toLowerCase())) {
+      version = firstWordAfter;
+      address = textAfter.substring(firstWordAfter.length).trim();
+    } else {
+      address = textAfter;
+      const versionMatch = textBefore.match(/(ATRACCIÓN\s+)?(CASTELLANO|EUSKERA|GALICIA|CATALÁN|ESTÁNDAR)/i);
+      if (versionMatch) {
+        version = versionMatch[0].trim();
+      } else {
+        const segments = textBefore.split(' ');
+        version = segments.slice(-2).join(' ').trim();
+      }
+    }
+  }
+
+  // Clean campaign metadata
+  version = version.replace(/FAMILY CASH|1Q|2Q|JUNIO|JULIO|FOLLETO|MARKET|\d+/gi, '').replace(/\s+/g, ' ').trim();
+  if (!version) {
+    version = 'Estándar';
+  }
+
+  return {
+    version: version,
+    address: address || 'Dirección no identificada',
+    quantity: quantity
+  };
+}
+
+/**
+ * Endpoint to parse delivery labels from uploaded PDF multi-page doc
+ */
 app.post("/api/parse-pdf", async (req, res) => {
   try {
     const { pdfBase64 } = req.body;
@@ -56,9 +132,42 @@ app.post("/api/parse-pdf", async (req, res) => {
       return res.status(400).json({ error: "No se ha proporcionado el contenido base64 del PDF." });
     }
 
+    // Strip raw data scheme URI prefix if any
+    const cleanBase64 = pdfBase64.replace(/^data:application\/pdf;base64,/, "");
+    const pdfBuffer = Buffer.from(cleanBase64, "base64");
+
+    // 1. Attempt local parsing first (100% Free & Fast)
+    try {
+      console.log("[Parse PDF] Intentando parseo local gratuito con pdf-parse...");
+      const parser = new pdf.PDFParse({ data: pdfBuffer });
+      const textResult = await parser.getText();
+      const parsedData: Array<{ version: string; address: string; quantity: number }> = [];
+
+      for (const page of textResult.pages) {
+        const itemResult = parsePageText(page.text);
+        parsedData.push(itemResult);
+      }
+
+      await parser.destroy();
+
+      // Verify that we parsed at least one page with valid quantities
+      const validResults = parsedData.filter(item => item.quantity > 0);
+      if (validResults.length > 0) {
+        console.log(`[Parse PDF] Parseo local exitoso de forma gratuita. Páginas procesadas: ${parsedData.length}`);
+        return res.json({ success: true, count: parsedData.length, data: parsedData });
+      }
+    } catch (localError) {
+      console.warn("[Parse PDF] El parseo local no devolvió resultados válidos o falló. Reintentando con Gemini...", localError);
+    }
+
+    // 2. Fallback to Gemini AI if a valid client API key is configured
     const clientApiKey = req.headers["x-gemini-api-key"] || process.env.GEMINI_API_KEY;
-    if (!clientApiKey) {
-      return res.status(401).json({ error: "No se ha proporcionado una clave API de Gemini. Configúrala en la interfaz o en las variables de entorno." });
+    const isKeyConfigured = clientApiKey && !String(clientApiKey).startsWith("AQ.Ab8RN6LG");
+
+    if (!isKeyConfigured) {
+      return res.status(400).json({
+        error: "El parseo automático local falló y no hay ninguna clave API de Gemini válida configurada en el servidor ni en la interfaz para el fallback por IA. Por favor, introduce tu API Key en la barra superior (icono ⚙️)."
+      });
     }
 
     const keyStr = String(clientApiKey).trim();
@@ -66,10 +175,7 @@ app.post("/api/parse-pdf", async (req, res) => {
       ? `${keyStr.substring(0, 4)}...${keyStr.substring(keyStr.length - 4)}` 
       : '***';
     const keySource = req.headers["x-gemini-api-key"] ? 'Cabecera del Cliente' : 'Env del Servidor';
-    console.log(`[Parse PDF] Utilizando clave API Gemini: ${maskedKey} (Origen: ${keySource})`);
-
-    // Strip raw data scheme URI prefix if any
-    const cleanBase64 = pdfBase64.replace(/^data:application\/pdf;base64,/, "");
+    console.log(`[Parse PDF] Ejecutando análisis por IA (Gemini). Clave: ${maskedKey} (Origen: ${keySource})`);
 
     const requestAi = new GoogleGenAI({
       apiKey: String(clientApiKey),
@@ -139,7 +245,6 @@ app.post("/api/parse-pdf", async (req, res) => {
       throw new Error("La IA no devolvió ningún JSON estructurado para el PDF.");
     }
 
-    // Strip markdown code block wrappers if modern models append them
     let cleanJson = jsonText.trim();
     if (cleanJson.startsWith("```")) {
       cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
