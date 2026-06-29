@@ -53,18 +53,18 @@ export const TransportManager: React.FC<TransportManagerProps> = ({
   return (
     <div className="flex flex-col gap-4">
       {/* Header / Add */}
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-3 mb-2">
         <input 
           type="text" 
           value={newTransportName}
           onChange={e => setNewTransportName(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && addTransport()}
           placeholder="Nombre del camión (ej. Camión 1 - Madrid)"
-          className="flex-1 bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-sm text-white focus:border-rose-500 focus:outline-none"
+          className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-white focus:border-apple-blue focus:outline-none shadow-sm transition-colors"
         />
         <button 
           onClick={addTransport}
-          className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded text-sm font-bold flex items-center gap-2 transition"
+          className="bg-apple-blue hover:bg-blue-600 dark:bg-apple-dark-blue dark:hover:bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition shadow-sm"
         >
           <Plus className="w-4 h-4" />
           Añadir Transporte
@@ -72,7 +72,7 @@ export const TransportManager: React.FC<TransportManagerProps> = ({
       </div>
 
       {transports.length === 0 && (
-        <div className="text-center p-6 bg-zinc-950/50 border border-zinc-800 border-dashed rounded-xl text-zinc-500 text-sm">
+        <div className="text-center p-8 bg-zinc-50/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 border-dashed rounded-2xl text-zinc-500 text-sm">
           No hay transportes creados. Crea uno para asignar partidas.
         </div>
       )}
@@ -84,11 +84,11 @@ export const TransportManager: React.FC<TransportManagerProps> = ({
           const totalQty = transportItems.reduce((acc, item) => acc + item.quantity, 0);
 
           return (
-            <div key={transport.id} className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 flex flex-col gap-3">
+            <div key={transport.id} className="bg-white dark:bg-apple-dark-surface border border-zinc-200 dark:border-apple-dark-border shadow-sm rounded-2xl p-5 flex flex-col gap-3">
               {/* Card Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
                 <div className="flex items-center gap-2">
-                  <Truck className="w-5 h-5 text-amber-400" />
+                  <Truck className="w-5 h-5 text-apple-blue dark:text-apple-dark-blue" />
                   {editingId === transport.id ? (
                     <input 
                       type="text"
@@ -104,17 +104,17 @@ export const TransportManager: React.FC<TransportManagerProps> = ({
                           setEditingId(null);
                         }
                       }}
-                      className="bg-zinc-900 border border-zinc-700 text-white px-2 py-1 text-sm rounded"
+                      className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white px-2 py-1 text-sm rounded-md focus:outline-none focus:border-apple-blue"
                     />
                   ) : (
-                    <span className="font-bold text-zinc-200">{transport.name}</span>
+                    <span className="font-bold text-zinc-900 dark:text-zinc-100">{transport.name}</span>
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => setEditingId(transport.id)} className="text-zinc-500 hover:text-amber-400">
+                  <button onClick={() => setEditingId(transport.id)} className="text-zinc-400 hover:text-apple-blue dark:hover:text-apple-dark-blue transition-colors">
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button onClick={() => removeTransport(transport.id)} className="text-zinc-500 hover:text-rose-400">
+                  <button onClick={() => removeTransport(transport.id)} className="text-zinc-400 hover:text-rose-500 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -152,16 +152,16 @@ export const TransportManager: React.FC<TransportManagerProps> = ({
                     <div 
                       key={item.id} 
                       onClick={() => toggleItemInTransport(transport.id, item.id)}
-                      className={`flex items-start gap-2 p-2 rounded cursor-pointer transition ${isSelected ? 'bg-amber-900/20' : 'hover:bg-zinc-900'}`}
+                      className={`flex items-start gap-3 p-2.5 rounded-xl cursor-pointer transition-colors ${isSelected ? 'bg-apple-blue/10 dark:bg-apple-dark-blue/20' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}`}
                     >
-                      <button className={`mt-0.5 shrink-0 ${isSelected ? 'text-amber-500' : 'text-zinc-600'}`}>
+                      <button className={`mt-0.5 shrink-0 transition-colors ${isSelected ? 'text-apple-blue dark:text-apple-dark-blue' : 'text-zinc-400'}`}>
                         {isSelected ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                       </button>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-semibold text-zinc-300 truncate">{item.version}</div>
+                        <div className={`text-xs font-semibold truncate ${isSelected ? 'text-apple-blue dark:text-apple-dark-blue' : 'text-zinc-700 dark:text-zinc-300'}`}>{item.version}</div>
                         <div className="text-[10px] text-zinc-500 truncate">{item.address}</div>
                       </div>
-                      <div className="text-xs font-mono text-zinc-400 shrink-0">
+                      <div className="text-xs font-mono text-zinc-500 dark:text-zinc-400 shrink-0">
                         {item.quantity.toLocaleString('es-ES')} ej.
                       </div>
                     </div>
@@ -170,9 +170,9 @@ export const TransportManager: React.FC<TransportManagerProps> = ({
               </div>
 
               {/* Footer Summary */}
-              <div className="pt-3 border-t border-zinc-800 flex justify-between items-center text-xs">
-                <span className="text-zinc-500">{transport.items.length} partidas asignadas</span>
-                <span className="font-bold text-amber-400">{totalQty.toLocaleString('es-ES')} ej. totales</span>
+              <div className="pt-3 mt-1 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center text-xs">
+                <span className="text-zinc-500 font-medium">{transport.items.length} partidas asignadas</span>
+                <span className="font-bold text-apple-blue dark:text-apple-dark-blue">{totalQty.toLocaleString('es-ES')} ej. totales</span>
               </div>
             </div>
           );

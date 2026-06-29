@@ -1119,9 +1119,9 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
       <div className="col-span-12 lg:col-span-5 flex flex-col gap-5">
 
         {/* ─── Datos del Folleto ─── */}
-        <section className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Ruler className="w-4 h-4 text-blue-400" />
+        <section className="bg-white dark:bg-apple-dark-surface shadow-sm rounded-2xl border border-zinc-200 dark:border-apple-dark-border p-5">
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Ruler className="w-4 h-4 text-apple-blue dark:text-apple-dark-blue" />
             Datos del Folleto
           </h3>
 
@@ -1298,21 +1298,21 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
 
           {/* Inline KPIs */}
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-center">
+            <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-center shadow-sm">
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block">Grosor Folleto</span>
-              <span className="text-base font-bold text-blue-400 font-mono">{fmtMm(result.brochureThicknessMm)} mm</span>
+              <span className="text-base font-bold text-blue-500 dark:text-blue-400 font-mono">{fmtMm(result.brochureThicknessMm)} mm</span>
             </div>
-            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-center">
+            <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-center shadow-sm">
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block">Peso Folleto</span>
-              <span className="text-base font-bold text-emerald-400 font-mono">{fmtG(result.brochureWeightG)} g</span>
+              <span className="text-base font-bold text-emerald-500 dark:text-emerald-400 font-mono">{fmtG(result.brochureWeightG)} g</span>
             </div>
           </div>
         </section>
 
         {/* ─── Configuración del Paquete ─── */}
-        <section className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
-            <BoxSelect className="w-4 h-4 text-amber-400" />
+        <section className="bg-white dark:bg-apple-dark-surface shadow-sm rounded-2xl border border-zinc-200 dark:border-apple-dark-border p-5">
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+            <BoxSelect className="w-4 h-4 text-amber-500 dark:text-amber-400" />
             Configuración del Paquete
           </h3>
 
@@ -1374,21 +1374,21 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
             * Parámetros opcionales: Si se definen folletos objetivo, número de capas o cantidad en base, se recalculará la altura, peso y total necesarios. La cantidad en base tiene prioridad sobre la disposición automática óptima.
           </span>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-center">
+            <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-center shadow-sm">
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block">Altura Paquete</span>
-              <span className="text-base font-bold text-amber-400 font-mono">{fmtMm(result.packageHeightMm)} mm</span>
+              <span className="text-base font-bold text-amber-500 dark:text-amber-400 font-mono">{fmtMm(result.packageHeightMm)} mm</span>
             </div>
-            <div className="bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-center">
+            <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-2.5 text-center shadow-sm">
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block">Peso Paquete</span>
-              <span className="text-base font-bold text-amber-400 font-mono">{(result.packageWeightG / 1000).toFixed(2)} kg</span>
+              <span className="text-base font-bold text-amber-500 dark:text-amber-400 font-mono">{(result.packageWeightG / 1000).toFixed(2)} kg</span>
             </div>
           </div>
         </section>
 
         {/* ─── Configuración del Palet ─── */}
-        <section className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Package className="w-4 h-4 text-rose-400" />
+        <section className="bg-white dark:bg-apple-dark-surface shadow-sm rounded-2xl border border-zinc-200 dark:border-apple-dark-border p-5">
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Package className="w-4 h-4 text-rose-500 dark:text-rose-400" />
             Configuración del Palet
           </h3>
 

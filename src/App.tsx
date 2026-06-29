@@ -30,7 +30,9 @@ import {
   ExternalLink,
   Package,
   Truck,
-  Settings
+  Settings,
+  Sun,
+  Moon
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { DistributionItem, PalletResult } from './types';
@@ -91,6 +93,21 @@ export default function App() {
   const [manualBarcode, setManualBarcode] = useState<string>('');
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [editingPalletItemIndex, setEditingPalletItemIndex] = useState<number | null>(null);
+
+  // Theme state
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    return document.documentElement.classList.contains('dark');
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
   
   // Customization styling parameters for PDF writing
   const [textTemplate, setTextTemplate] = useState<string>("");
@@ -1122,8 +1139,19 @@ export default function App() {
   const handleSaveCustomPallets = (pallets: PalletResult[]) => {
     if (editingPalletItemIndex === null) return;
     const newList = [...distributionList];
-    const newTotal = pallets.reduce((sum, p) => sum + p.quantity, 0);
-    newList[editingPalletItemIndex].customPallets = pallets;
+    
+    // Filter out pallets with 0 quantity and reindex
+    const cleanedPallets = pallets
+      .filter(p => p.quantity > 0)
+      .map((p, idx, arr) => ({
+        ...p,
+        palletIndex: idx + 1,
+        totalPallets: arr.length,
+        isAdjusted: true
+      }));
+
+    const newTotal = cleanedPallets.reduce((sum, p) => sum + p.quantity, 0);
+    newList[editingPalletItemIndex].customPallets = cleanedPallets;
     newList[editingPalletItemIndex].quantity = newTotal; // Approve balance and recalculate total
     setDistributionList(newList);
     setSuccessMsg(`Palets ajustados manualmente para la partida: ${newList[editingPalletItemIndex].version}`);
@@ -1257,22 +1285,36 @@ export default function App() {
     : (typeof albaranesMinPico === 'number' ? albaranesMinPico : 2800);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen flex flex-col">
       {/* Header Bar */}
-      <header className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4">
+      <header className="border-b border-apple-border dark:border-apple-dark-border glass dark:glass-dark sticky top-0 z-40 px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="p-1.5 bg-rose-600 rounded text-stone-50 font-bold text-xs tracking-wider">LOGISTIK</span>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <span className="p-1.5 bg-apple-blue dark:bg-apple-dark-blue rounded-xl text-white font-bold text-xs tracking-wider shadow-sm">LOGISTIK</span>
+              <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
                 Gestor de Paletizado Auto-Optimizado
               </h1>
             </div>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              Cálculo de bultos por partidas con duplicado inteligente de etiquetas PDF (Altavia Iberica Style)
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Cálculo de bultos por partidas con duplicado inteligente de etiquetas PDF (Apple & Altavia Style)
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={() => setIsDark(!isDark)}
+              className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shadow-sm text-zinc-600 dark:text-zinc-400 mr-2"
+              title="Alternar Modo Oscuro"
+            >
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={handleResetApp}
+              className="px-3 py-1.5 text-xs font-bold rounded-lg border border-red-200 dark:border-rose-900/50 bg-red-50 dark:bg-rose-950/20 hover:bg-red-100 dark:hover:bg-rose-900/40 text-red-600 dark:text-rose-400 transition-colors shadow-sm flex items-center gap-1.5 mr-2"
+              title="Reiniciar aplicación y borrar todos los datos actuales"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Reset
+            </button>
             <button 
               onClick={() => setShowSettings(!showSettings)}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all flex items-center gap-2 ${
@@ -1350,50 +1392,50 @@ export default function App() {
       )}
 
       {/* Tab Switcher */}
-      <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-2.5">
+      <div className="border-b border-apple-border dark:border-apple-dark-border bg-apple-surface/80 dark:bg-apple-dark-surface/80 backdrop-blur-md px-6 py-2.5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setActiveTab('etiquetas')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+              className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all flex items-center gap-2 ${
                 activeTab === 'etiquetas'
-                  ? 'bg-rose-600 text-stone-50 shadow-md shadow-rose-950/40 font-extrabold'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800 font-semibold'
+                  ? 'bg-apple-blue dark:bg-apple-dark-blue text-white shadow-md shadow-apple-blue/20 font-bold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800'
               }`}
             >
-              <FileCheck className="w-4 h-4 text-emerald-400" />
+              <FileCheck className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               Módulo 1: ETIQUETAS
             </button>
             <button
               onClick={() => setActiveTab('albaranes')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+              className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all flex items-center gap-2 ${
                 activeTab === 'albaranes'
-                  ? 'bg-rose-600 text-stone-50 shadow-md shadow-rose-950/40 font-extrabold'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800 font-semibold'
+                  ? 'bg-apple-blue dark:bg-apple-dark-blue text-white shadow-md shadow-apple-blue/20 font-bold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800'
               }`}
             >
-              <FileText className="w-4 h-4 text-amber-400" />
+              <FileText className="w-4 h-4 text-amber-500 dark:text-amber-400" />
               Módulo 2: ALBARANES
             </button>
             <button
               onClick={() => setActiveTab('cubicaje')}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+              className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all flex items-center gap-2 ${
                 activeTab === 'cubicaje'
-                  ? 'bg-rose-600 text-stone-50 shadow-md shadow-rose-950/40 font-extrabold'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800 font-semibold'
+                  ? 'bg-apple-blue dark:bg-apple-dark-blue text-white shadow-md shadow-apple-blue/20 font-bold'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-zinc-800'
               }`}
             >
-              <Package className="w-4 h-4 text-blue-400" />
+              <Package className="w-4 h-4 text-blue-500 dark:text-blue-400" />
               Módulo 3: CUBICAJE
             </button>
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-zinc-400">
-            <span className="font-semibold text-zinc-300">Modo Activo:</span>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase transition-all ${
-              activeTab === 'etiquetas' ? 'bg-rose-950 text-rose-300 border border-rose-900/40' :
-              activeTab === 'albaranes' ? 'bg-emerald-950 text-emerald-300 border border-emerald-900/45' :
-              'bg-blue-950 text-blue-300 border border-blue-900/40'
+          <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="font-semibold text-zinc-700 dark:text-zinc-300">Modo Activo:</span>
+            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase transition-all shadow-sm ${
+              activeTab === 'etiquetas' ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/45' :
+              activeTab === 'albaranes' ? 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/45' :
+              'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40'
             }`}>
               {activeTab === 'etiquetas' ? 'Duplicación por bulto' : activeTab === 'albaranes' ? 'Estructura 1-a-1 sin duplicar' : 'Cubicaje de folletos en palet'}
             </span>
@@ -1543,17 +1585,17 @@ export default function App() {
         <div className="col-span-12 lg:col-span-6 flex flex-col gap-6">
           
           {/* File Upload Area */}
-          <div className="bg-zinc-900 rounded-xl border border-zinc-850 p-5">
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider mb-4 flex items-center justify-between">
+          <div className="bg-white dark:bg-apple-dark-surface rounded-2xl border border-zinc-200 dark:border-apple-dark-border shadow-sm p-6">
+            <h2 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-4 flex items-center justify-between">
               <span>Cargar Información de Distribución</span>
-              <span className="text-xs text-zinc-400 font-medium">Excel / CSV</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-md">Excel / CSV</span>
             </h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* File input spreadsheet */}
               <div 
                 onClick={() => excelInputRef.current?.click()}
-                className="border-2 border-dashed border-zinc-700 hover:border-zinc-500 cursor-pointer rounded-xl p-4 flex flex-col items-center justify-center text-center hover:bg-zinc-850/50 transition-all group"
+                className="border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-apple-blue dark:hover:border-apple-blue cursor-pointer rounded-xl p-5 flex flex-col items-center justify-center text-center hover:bg-apple-blue/5 transition-all group"
               >
                 <input 
                   type="file" 
@@ -1562,50 +1604,50 @@ export default function App() {
                   accept=".xlsx, .xls, .csv"
                   className="hidden" 
                 />
-                <FileSpreadsheet className="w-8 h-8 text-emerald-500 group-hover:scale-110 transition-transform mb-2" />
-                <span className="text-xs font-semibold text-zinc-200">Subir listado Excel</span>
-                <span className="text-[10px] text-zinc-500 mt-0.5">Soporta .xlsx, .csv</span>
+                <FileSpreadsheet className="w-8 h-8 text-apple-blue dark:text-apple-dark-blue group-hover:scale-110 transition-transform mb-3" />
+                <span className="text-xs font-bold text-zinc-900 dark:text-white">Subir listado Excel</span>
+                <span className="text-[10px] text-zinc-500 mt-1">Soporta .xlsx, .csv</span>
               </div>
 
               {/* Paste preview csv template */}
               <div 
                 onClick={handleLoadCsvPaste}
-                className="border-2 border-dashed border-rose-900/30 hover:border-rose-500/50 cursor-pointer rounded-xl p-4 flex flex-col items-center justify-center text-center hover:bg-rose-500/5 transition-all group"
+                className="border-2 border-dashed border-amber-300 dark:border-amber-900/30 hover:border-amber-500/50 cursor-pointer rounded-xl p-5 flex flex-col items-center justify-center text-center hover:bg-amber-50 dark:hover:bg-amber-500/5 transition-all group"
               >
-                <SlidersHorizontal className="w-8 h-8 text-rose-500 group-hover:scale-110 transition-transform mb-2" />
-                <span className="text-xs font-semibold text-zinc-200">Usar lote de demostración</span>
-                <span className="text-[10px] text-zinc-500 mt-0.5">Versión Euskera / Galicia</span>
+                <SlidersHorizontal className="w-8 h-8 text-amber-500 group-hover:scale-110 transition-transform mb-3" />
+                <span className="text-xs font-bold text-zinc-900 dark:text-white">Usar lote de demostración</span>
+                <span className="text-[10px] text-zinc-500 mt-1">Versión Euskera / Galicia</span>
               </div>
             </div>
           </div>
 
           {/* Records list + manual addition */}
-          <div className="bg-zinc-900 rounded-xl border border-zinc-850 p-5 flex-1 flex flex-col min-h-[400px]">
+          <div className="bg-white dark:bg-apple-dark-surface rounded-2xl border border-zinc-200 dark:border-apple-dark-border shadow-sm p-6 flex-1 flex flex-col min-h-[400px]">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
+              <h2 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                 <span>Partidas de Distribución</span>
-                <span className="px-2 py-0.5 bg-zinc-800 rounded-full text-xs text-zinc-400">{distributionList.length}</span>
+                <span className="px-2 py-0.5 bg-apple-blue/10 dark:bg-apple-dark-blue/20 text-apple-blue dark:text-apple-dark-blue rounded-full text-xs font-bold border border-apple-blue/20">{distributionList.length}</span>
               </h2>
               {distributionList.length > 0 && (
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={() => exportDesgloseToExcel(distributionList, Number(activeFullPalletSize) || 21000, Number(activeMinPico) || 100)}
-                    className="text-xs text-zinc-400 hover:text-emerald-400 transition flex items-center gap-1 bg-zinc-800 px-2 py-1 rounded"
+                    className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg"
                   >
                     <Download className="w-3 h-3" />
                     Excel
                   </button>
                   <button 
                     onClick={() => exportDesgloseToPdf(distributionList, Number(activeFullPalletSize) || 21000, Number(activeMinPico) || 100)}
-                    className="text-xs text-zinc-400 hover:text-rose-400 transition flex items-center gap-1 bg-zinc-800 px-2 py-1 rounded"
+                    className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 transition flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg"
                   >
                     <Download className="w-3 h-3" />
                     PDF
                   </button>
-                  <div className="w-px h-4 bg-zinc-700 mx-1"></div>
+                  <div className="w-px h-4 bg-zinc-200 dark:bg-zinc-700 mx-1"></div>
                   <button 
                     onClick={handleClearList}
-                    className="text-xs text-zinc-500 hover:text-rose-400 transition flex items-center gap-1"
+                    className="text-xs font-semibold text-zinc-500 hover:text-red-500 transition-colors flex items-center gap-1"
                   >
                     <Trash2 className="w-3 h-3" />
                     Vaciar Todo
@@ -1615,22 +1657,22 @@ export default function App() {
             </div>
 
             {/* List Table scroll region */}
-            <div className="overflow-x-auto flex-1 max-h-[440px] border border-zinc-800 rounded-lg bg-zinc-950/50">
+            <div className="overflow-x-auto flex-1 max-h-[440px] border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 shadow-inner">
               <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-zinc-800 bg-zinc-900/70 text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
-                    <th className="py-2.5 px-3">Versión</th>
-                    <th className="py-2.5 px-3">Dirección del Cliente</th>
-                    <th className="py-2.5 px-3">Observaciones</th>
-                    <th className="py-2.5 px-3 text-right">Ejemplares</th>
-                    <th className="py-2.5 px-3 text-center">Bultos</th>
-                    <th className="py-2.5 px-3 text-center"></th>
+                <thead className="sticky top-0 z-10 backdrop-blur-md bg-white/90 dark:bg-zinc-900/90 shadow-sm">
+                  <tr className="border-b border-zinc-200 dark:border-zinc-800 text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-bold">
+                    <th className="py-3 px-4">Versión</th>
+                    <th className="py-3 px-4">Dirección del Cliente</th>
+                    <th className="py-3 px-4">Observaciones</th>
+                    <th className="py-3 px-4 text-right">Ejemplares</th>
+                    <th className="py-3 px-4 text-center">Bultos</th>
+                    <th className="py-3 px-4 text-center"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/40 text-xs text-zinc-300">
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800/60 text-xs text-zinc-700 dark:text-zinc-300">
                   {distributionList.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-zinc-500">
+                      <td colSpan={6} className="py-12 text-center text-zinc-500 font-medium">
                         No hay partidas en la lista. Sube un Excel o añade manualmente una partida abajo.
                       </td>
                     </tr>
@@ -1642,87 +1684,87 @@ export default function App() {
                       return (
                         <tr 
                           key={item.id}
-                          className={`hover:bg-zinc-900/60 transition group cursor-pointer ${isItemActive ? 'bg-rose-500/10 border-l-2 border-rose-500' : ''}`}
+                          className={`hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors group cursor-pointer ${isItemActive ? 'bg-apple-blue/5 dark:bg-apple-blue/10 border-l-4 border-apple-blue' : 'border-l-4 border-transparent'}`}
                           onClick={() => setSelectedPreviewItemIdx(index)}
                         >
-                          <td className="py-2 px-3 font-semibold text-white">
+                          <td className="py-2.5 px-4 font-bold text-zinc-900 dark:text-white">
                             {editingRowId === item.id ? (
                               <input 
                                 type="text"
                                 value={item.version}
                                 onChange={(e) => handleSaveRowValue(item.id, 'version', e.target.value)}
-                                className="bg-zinc-950 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-white"
+                                className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-xs text-zinc-900 dark:text-white focus:outline-none focus:border-apple-blue shadow-sm"
                                 onClick={(e) => e.stopPropagation()}
                               />
                             ) : (
                               item.version
                             )}
                           </td>
-                          <td className="py-2 px-3 text-zinc-400 max-w-[200px] truncate" title={item.address}>
+                          <td className="py-2.5 px-4 text-zinc-600 dark:text-zinc-400 max-w-[200px] truncate" title={item.address}>
                             {editingRowId === item.id ? (
                               <input 
                                 type="text"
                                 value={item.address}
                                 onChange={(e) => handleSaveRowValue(item.id, 'address', e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-white"
+                                className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-xs text-zinc-900 dark:text-white focus:outline-none focus:border-apple-blue shadow-sm"
                                 onClick={(e) => e.stopPropagation()}
                               />
                             ) : (
                               item.address
                             )}
                           </td>
-                          <td className="py-2 px-3 text-zinc-400 max-w-[150px] truncate" title={item.barcode}>
+                          <td className="py-2.5 px-4 text-zinc-500 dark:text-zinc-500 max-w-[150px] truncate" title={item.barcode}>
                             {item.barcode || '-'}
                           </td>
-                          <td className="py-2 px-3 text-right font-mono text-zinc-200">
+                          <td className="py-2.5 px-4 text-right font-mono font-semibold text-zinc-800 dark:text-zinc-200">
                             {editingRowId === item.id ? (
                               <input 
                                 type="number"
                                 value={item.quantity}
                                 onChange={(e) => handleSaveRowValue(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                                className="w-20 bg-zinc-950 border border-zinc-700 rounded px-1.5 py-0.5 text-xs text-white text-right"
+                                className="w-24 bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-1 text-xs text-zinc-900 dark:text-white text-right focus:outline-none focus:border-apple-blue shadow-sm"
                                 onClick={(e) => e.stopPropagation()}
                               />
                             ) : (
                               formatQuantitySpain(item.quantity)
                             )}
                           </td>
-                          <td className="py-2 px-3 text-center">
-                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 font-bold border border-rose-900/30">
+                          <td className="py-2.5 px-4 text-center">
+                            <span className="px-2 py-1 rounded-md text-[10px] bg-apple-blue/10 dark:bg-apple-dark-blue/20 text-apple-blue dark:text-apple-dark-blue font-bold border border-apple-blue/20 shadow-sm">
                               {calculatedPallets.length} bulto{calculatedPallets.length > 1 ? 's' : ''}
                             </span>
                           </td>
-                          <td className="py-2 px-3 text-right" onClick={(e) => e.stopPropagation()}>
+                          <td className="py-2.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-end gap-1">
                               {editingRowId === item.id ? (
                                 <button 
                                   onClick={() => setEditingRowId(null)}
-                                  className="p-1 text-emerald-400 hover:text-emerald-300 rounded hover:bg-zinc-800"
+                                  className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 bg-emerald-50 dark:bg-zinc-800 rounded-md font-bold text-xs shadow-sm transition-colors"
                                 >
                                   OK
                                 </button>
                               ) : (
                                 <button 
                                   onClick={() => handleEditRowInline(item.id)}
-                                  className="p-1 text-zinc-400 hover:text-white rounded hover:bg-zinc-800"
+                                  className="p-1.5 text-zinc-500 dark:text-zinc-400 hover:text-apple-blue dark:hover:text-white rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                   title="Editar"
                                 >
-                                  <Edit2 className="w-3 h-3" />
+                                  <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                               )}
                               <button 
                                 onClick={() => setEditingPalletItemIndex(index)}
-                                className="p-1 text-zinc-400 hover:text-amber-400 rounded hover:bg-zinc-800"
+                                className="p-1.5 text-zinc-500 dark:text-zinc-400 hover:text-amber-500 dark:hover:text-amber-400 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                 title="Balanceo Manual (Editar Palets)"
                               >
-                                <Package className="w-3 h-3" />
+                                <Package className="w-3.5 h-3.5" />
                               </button>
                               <button 
                                 onClick={() => handleDeleteRow(item.id)}
-                                className="p-1 text-zinc-500 hover:text-rose-400 rounded hover:bg-zinc-800"
+                                className="p-1.5 text-zinc-500 dark:text-zinc-500 hover:text-red-500 dark:hover:text-rose-400 rounded-md hover:bg-red-50 dark:hover:bg-zinc-800 transition-colors"
                                 title="Eliminar"
                               >
-                                <Trash2 className="w-3 h-3" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </td>
@@ -1736,20 +1778,20 @@ export default function App() {
 
             {/* Quick calculations per calculated pallet breakdown */}
             {distributionList.length > 0 && selectedPreviewItemIdx < distributionList.length && (
-              <div className="mt-3 bg-zinc-950 p-3 rounded-lg border border-zinc-800 text-xs">
-                <div className="flex justify-between items-center mb-1 bg-zinc-900/60 p-1.5 rounded">
-                  <span className="font-semibold text-zinc-300">Desglose de Paletizado para partida actual (#{(selectedPreviewItemIdx + 1)}):</span>
+              <div className="mt-4 bg-zinc-50 dark:bg-zinc-950/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <div className="flex justify-between items-center mb-2 bg-white dark:bg-zinc-900/60 p-2 rounded-lg shadow-sm border border-zinc-100 dark:border-zinc-800">
+                  <span className="font-bold text-zinc-900 dark:text-zinc-300 text-xs">Desglose de Paletizado para partida actual (#{(selectedPreviewItemIdx + 1)}):</span>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setEditingPalletItemIndex(selectedPreviewItemIdx)}
-                      className="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                      className="text-xs bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-300 px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors font-medium shadow-sm"
                     >
                       <Edit2 className="w-3 h-3" /> Editar Palets
                     </button>
-                    <span className="font-bold text-rose-400">{distributionList[selectedPreviewItemIdx].version}</span>
+                    <span className="font-bold text-apple-blue dark:text-apple-dark-blue">{distributionList[selectedPreviewItemIdx].version}</span>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-3">
                   { (distributionList[selectedPreviewItemIdx].customPallets || calculatePalletsForQuantity(
                     distributionList[selectedPreviewItemIdx].quantity, 
                     activeFullPalletSize, 
@@ -1757,11 +1799,11 @@ export default function App() {
                   )).map((pallet, pIdx) => (
                     <div 
                       key={pIdx} 
-                      className={`px-2.5 py-1.5 rounded-md border flex flex-col text-center ${pallet.isAdjusted ? 'bg-amber-950/40 border-amber-500/45 text-amber-300' : 'bg-zinc-900 border-zinc-800 text-zinc-300'}`}
+                      className={`px-3 py-2 rounded-lg border flex flex-col text-center shadow-sm ${pallet.isAdjusted ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-500/45 text-amber-800 dark:text-amber-300' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-300'}`}
                     >
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-400">Palet {pallet.palletIndex} de {pallet.totalPallets}</span>
-                      <span className="font-mono font-bold text-sm text-white">{formatQuantitySpain(pallet.quantity)} ej</span>
-                      {pallet.isAdjusted && <span className="text-[9px] text-amber-400 font-semibold italic">Balanceado (Pico)</span>}
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 dark:text-zinc-400">Palet {pallet.palletIndex} de {pallet.totalPallets}</span>
+                      <span className="font-mono font-bold text-sm text-zinc-900 dark:text-white">{formatQuantitySpain(pallet.quantity)} ej</span>
+                      {pallet.isAdjusted && <span className="text-[9px] text-amber-600 dark:text-amber-400 font-bold mt-0.5">Balanceado (Pico)</span>}
                     </div>
                   ))}
                 </div>
@@ -1769,33 +1811,33 @@ export default function App() {
             )}
 
             {/* Manual item adder */}
-            <div className="mt-4 pt-4 border-t border-zinc-800">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-3 flex items-center gap-1.5">
-                <Plus className="w-3 h-3" /> Añadir partida manualmente
+            <div className="mt-5 pt-5 border-t border-zinc-200 dark:border-zinc-800">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-400 mb-4 flex items-center gap-1.5">
+                <Plus className="w-3.5 h-3.5" /> Añadir partida manualmente
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
                 <div className="sm:col-span-2">
-                  <label className="text-[10px] text-zinc-400 font-semibold block mb-1">Versión de folleto</label>
+                  <label className="text-[10px] text-zinc-600 dark:text-zinc-400 font-bold block mb-1.5">Versión de folleto</label>
                   <input 
                     type="text" 
                     value={manualVersion} 
                     onChange={e => setManualVersion(e.target.value)}
                     placeholder="Ej. Estándar"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-900 dark:text-white focus:border-apple-blue focus:outline-none shadow-sm transition-colors"
                   />
                 </div>
                 <div className="sm:col-span-4">
-                  <label className="text-[10px] text-zinc-400 font-semibold block mb-1">Dirección / Localidad</label>
+                  <label className="text-[10px] text-zinc-600 dark:text-zinc-400 font-bold block mb-1.5">Dirección / Localidad</label>
                   <input 
                     type="text" 
                     value={manualAddress} 
                     onChange={e => setManualAddress(e.target.value)}
                     placeholder="Ej. REPAPUBLI Cuenca"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-900 dark:text-white focus:border-apple-blue focus:outline-none shadow-sm transition-colors"
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="text-[10px] text-zinc-400 font-semibold block mb-1">Tirada (Ejemplares)</label>
+                  <label className="text-[10px] text-zinc-600 dark:text-zinc-400 font-bold block mb-1.5">Tirada (Ejemplares)</label>
                   <input 
                     type="number" 
                     value={manualQuantity} 
@@ -1809,26 +1851,26 @@ export default function App() {
                       }
                     }}
                     placeholder="Ej. 10000"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:border-rose-500 focus:outline-none text-right font-mono"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-900 dark:text-white focus:border-apple-blue focus:outline-none text-right font-mono shadow-sm transition-colors"
                   />
                 </div>
                 <div className="sm:col-span-3">
-                  <label className="text-[10px] text-zinc-400 font-semibold block mb-1">Observaciones</label>
+                  <label className="text-[10px] text-zinc-600 dark:text-zinc-400 font-bold block mb-1.5">Observaciones</label>
                   <input 
                     type="text" 
                     value={manualBarcode} 
                     onChange={e => setManualBarcode(e.target.value)}
                     placeholder="Ej. Entregar por la mañana"
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-white focus:border-rose-500 focus:outline-none"
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-900 dark:text-white focus:border-apple-blue focus:outline-none shadow-sm transition-colors"
                   />
                 </div>
                 <div className="sm:col-span-1">
                   <button 
                     onClick={handleAddRow}
-                    className="w-full bg-rose-600 hover:bg-rose-500 text-stone-100 hover:text-white rounded py-1.5 flex items-center justify-center font-bold text-xs transition"
+                    className="w-full bg-apple-blue dark:bg-apple-dark-blue hover:bg-blue-600 text-white rounded-lg py-2 flex items-center justify-center font-bold text-sm transition-colors shadow-sm"
                     title="Añadir partida"
                   >
-                    +
+                    <Plus className="w-4 h-4" />
                   </button>
                 </div>
               </div>
