@@ -430,7 +430,7 @@ export default function App() {
 
     distributionList.forEach(item => {
       totalLeaflets += item.quantity;
-      const pallets = calculatePalletsForQuantity(item.quantity, size, pico);
+      const pallets = item.customPallets || calculatePalletsForQuantity(item.quantity, size, pico);
       totalPalletsCount += pallets.length;
       
       pallets.forEach(p => {
@@ -712,71 +712,131 @@ export default function App() {
       
       let transportName = '';
       let transportItems: DistributionItem[] = [];
-      let transportAddresses: string[] = [];
       let totalQty = 0;
+      let firstVersion = '';
 
       if (transportsList.length > 0) {
         const t = transportsList[i];
         transportName = t.name;
         transportItems = dList.filter(d => t.items.includes(d.id));
-        transportAddresses = Array.from(new Set(transportItems.map(item => item.address)));
         totalQty = transportItems.reduce((acc, it) => acc + it.quantity, 0);
+        if (transportItems.length > 0) firstVersion = transportItems[0].version;
       } else if (dList.length > 0) {
         const it = dList[i];
         transportName = 'Envío Directo';
         transportItems = [it];
-        transportAddresses = [it.address];
         totalQty = it.quantity;
+        firstVersion = it.version;
       } else {
         transportName = 'Sin items';
       }
 
-      let currentY = height - 60;
+      let currentY = height - 40;
       let pageNum = 1;
 
       const drawHeader = () => {
-        currentY = height - 60;
-        page.drawText('ALBARÁN DE ENTREGA', { x: 40, y: currentY, size: 24, font: boldFont, color: accentColor });
-        page.drawText(`Nº: ALB-${new Date().getFullYear()}-${String(i+1).padStart(4, '0')} - Pág ${pageNum}`, { x: 40, y: currentY - 20, size: 10, font: font, color: grayColor });
-
-        const detailsLines = (senderDetails || 'ALTAVIA IBERICA S.A.\\nPLANIFICACION LOGISTICA INDUSTRIAL').split('\\n');
-        let headerY = currentY;
+        // Sender Block
+        const defaultSender = 'COMECO INTEGRA S.L.U.\nC/ Meridiano, 19\n28850 Torrejón de Ardoz - N.I.F. B87584793';
+        let rawSender = senderDetails || defaultSender;
+        rawSender = rawSender.replace(/\\n/g, '\n');
+        const detailsLines = rawSender.split('\n');
+        
+        let headerY = height - 40;
         detailsLines.forEach((line, idx) => {
-          page.drawText(line, { x: width - 200, y: headerY, size: idx === 0 ? 10 : 8, font: idx === 0 ? boldFont : font, color: blackColor });
+          page.drawText(line, { x: 40, y: headerY, size: idx === 0 ? 10 : 8, font: idx === 0 ? boldFont : font, color: blackColor });
           headerY -= 12;
         });
 
-        currentY -= 60;
-        page.drawText('ENTREGAR A (Destinatario):', { x: 40, y: currentY, size: 9, font: boldFont, color: accentColor });
-        const addressStr = transportAddresses.join(', ').substring(0, 150);
-        const addrLines = [];
-        for (let idx = 0; idx < addressStr.length; idx += 40) addrLines.push(addressStr.substring(idx, idx + 40));
-        let addrY = currentY - 14;
-        addrLines.forEach(l => {
-          page.drawText(l.trim(), { x: 40, y: addrY, size: 10, font: boldFont, color: blackColor });
-          addrY -= 14;
-        });
-
-        page.drawText('FECHA / DATE:', { x: width - 200, y: currentY, size: 8, font: boldFont, color: grayColor });
-        page.drawText(new Date().toLocaleDateString('es-ES'), { x: width - 200, y: currentY - 12, size: 10, font: boldFont, color: blackColor });
+        // Copies Options
+        page.drawRectangle({ x: width - 150, y: height - 42, width: 8, height: 8, color: rgb(1,1,1), borderColor: blackColor, borderWidth: 1 });
+        page.drawText('COPIA COMECO', { x: width - 135, y: height - 42, size: 8, font: font, color: blackColor });
         
-        page.drawText('CAMIÓN / TRANSPORTE:', { x: width - 200, y: currentY - 36, size: 8, font: boldFont, color: grayColor });
-        page.drawText(transportName, { x: width - 200, y: currentY - 48, size: 10, font: boldFont, color: blackColor });
+        page.drawRectangle({ x: width - 150, y: height - 54, width: 8, height: 8, color: rgb(1,1,1), borderColor: blackColor, borderWidth: 1 });
+        page.drawText('COPIA RECEPTOR', { x: width - 135, y: height - 54, size: 8, font: font, color: blackColor });
 
-        currentY = addrY - 40;
+        currentY = headerY - 15;
+        
+        // ALBARÁN ENTREGA
+        page.drawText('ALBARÁN ENTREGA', { x: 40, y: currentY, size: 24, font: boldFont, color: accentColor });
+        
+        // Data Row 1
+        currentY -= 30;
+        page.drawText('Nº Orden:', { x: 40, y: currentY, size: 8, font: boldFont, color: grayColor });
+        page.drawText(`ALB-${new Date().getFullYear()}-${String(i+1).padStart(4, '0')}`, { x: 40, y: currentY - 12, size: 10, font: boldFont, color: blackColor });
+
+        page.drawText('Nº Albarán:', { x: 180, y: currentY, size: 8, font: boldFont, color: grayColor });
+        page.drawText(`ALB-${new Date().getFullYear()}-${String(i+1).padStart(4, '0')}`, { x: 180, y: currentY - 12, size: 10, font: boldFont, color: blackColor });
+        
+        // Barcode visualization
+        page.drawText(`*ALB-${new Date().getFullYear()}-${String(i+1).padStart(4, '0')}*`, { x: 180, y: currentY - 22, size: 8, font: font, color: grayColor });
+
+        page.drawText('Fecha de Entrega:', { x: 380, y: currentY, size: 8, font: boldFont, color: grayColor });
+        page.drawText(new Date().toLocaleDateString('es-ES'), { x: 380, y: currentY - 12, size: 10, font: boldFont, color: blackColor });
+        
+        page.drawText(`Pág ${pageNum}`, { x: width - 70, y: currentY - 12, size: 10, font: font, color: grayColor });
+
+        // Data Row 2
+        currentY -= 35;
+        page.drawText('ORIGEN:', { x: 40, y: currentY, size: 8, font: boldFont, color: grayColor });
+        page.drawText(detailsLines[0], { x: 40, y: currentY - 12, size: 9, font: boldFont, color: blackColor });
+
+        page.drawText('Campaña / Versión:', { x: 380, y: currentY, size: 8, font: boldFont, color: grayColor });
+        page.drawText(firstVersion.substring(0, 30), { x: 380, y: currentY - 12, size: 9, font: boldFont, color: blackColor });
+
+        // Data Row 3
+        currentY -= 35;
+        page.drawText('Modo Transporte:', { x: 40, y: currentY, size: 8, font: boldFont, color: grayColor });
+        page.drawText(transportName, { x: 40, y: currentY - 12, size: 10, font: boldFont, color: blackColor });
+        
+        // Table Header
+        currentY -= 30;
         page.drawRectangle({ x: 40, y: currentY - 15, width: width - 80, height: 25, color: accentColor });
-        page.drawText('VERSIÓN / PRODUCTO', { x: 50, y: currentY - 6, size: 9, font: boldFont, color: rgb(1,1,1) });
-        page.drawText('CANTIDAD', { x: 300, y: currentY - 6, size: 9, font: boldFont, color: rgb(1,1,1) });
+        page.drawText('CANTIDAD ENTREGADA', { x: 50, y: currentY - 6, size: 9, font: boldFont, color: rgb(1,1,1) });
+        page.drawText('CONCEPTO', { x: 220, y: currentY - 6, size: 9, font: boldFont, color: rgb(1,1,1) });
         page.drawText('DESTINO', { x: 380, y: currentY - 6, size: 9, font: boldFont, color: rgb(1,1,1) });
         currentY -= 35;
       };
 
       const checkPageBreak = (neededSpace: number) => {
-        if (currentY - neededSpace < 200) {
+        // Need space for footer (approx 160px)
+        if (currentY - neededSpace < 160) {
+          drawFooter();
           page = pdfDoc.addPage([595.27, 841.89]);
           pageNum++;
           drawHeader();
         }
+      };
+
+      const drawFooter = () => {
+        const footerY = 120;
+        
+        // Observations block (full width)
+        page.drawRectangle({ x: 40, y: footerY - 30, width: width - 80, height: 30, color: rgb(0.96,0.96,0.96), borderColor: grayColor, borderWidth: 1 });
+        page.drawText('Comentario:', { x: 45, y: footerY - 12, size: 8, font: boldFont, color: grayColor });
+        
+        const transportObs = Array.from(new Set(transportItems.map(it => it.barcode).filter(Boolean))).join(' | ');
+        if (transportObs) {
+          page.drawText(transportObs.length > 100 ? transportObs.substring(0, 100) + '...' : transportObs, { x: 100, y: footerY - 12, size: 8, font: font, color: blackColor });
+        }
+        
+        // Signature block (full width)
+        page.drawRectangle({ x: 40, y: footerY - 80, width: width - 80, height: 45, color: rgb(0.98, 0.98, 0.98), borderColor: lightGray, borderWidth: 1 });
+        page.drawText('Recibí: Firma y sello:', { x: 45, y: footerY - 45, size: 9, font: boldFont, color: grayColor });
+        page.drawLine({ start: { x: width - 250, y: footerY - 65 }, end: { x: width - 60, y: footerY - 65 }, color: grayColor, thickness: 1 });
+        page.drawText('Nombre / DNI / Fecha', { x: width - 180, y: footerY - 75, size: 7, font: font, color: grayColor });
+        
+        // Legal Text
+        const legal1 = "Los residuos derivados de los embalajes de los productos suministrados, (Flejes, film plástico y cartón), son residuos no peligrosos y deberán";
+        const legal2 = "gestionarse por ustedes de manera adecuada, mediante su depósito en los contenedores municipales convenientemente segregados, o bien mediante su";
+        const legal3 = "entrega a gestor autorizado para su reciclado. No obstante, antes de considerar estos materiales como residuos, considere la posibilidad de";
+        const legal4 = "reutilizarlos internamente. El responsable de la entrega del residuo del envase o envase usado, para su gestión ambiental, será su poseedor final.";
+        page.drawText(legal1, { x: 40, y: 25, size: 5.5, font: font, color: grayColor });
+        page.drawText(legal2, { x: 40, y: 20, size: 5.5, font: font, color: grayColor });
+        page.drawText(legal3, { x: 40, y: 15, size: 5.5, font: font, color: grayColor });
+        page.drawText(legal4, { x: 40, y: 10, size: 5.5, font: font, color: grayColor });
+        
+        const certs = "Sólo los productos que se identifican como tal son PEFC Certificado: Nº Certificado BMC-PEFC-COC-00237 | certificados FSC®. Nº Certificado BMC-COC-007865 | Nº Registro RD 1055/2022: ENV/2023/000029862";
+        page.drawText(certs, { x: 40, y: 5, size: 5, font: boldFont, color: grayColor });
       };
 
       let totalPalletsCount = 0;
@@ -784,11 +844,11 @@ export default function App() {
       drawHeader();
 
       transportItems.forEach((item) => {
-        checkPageBreak(30); // Need space for item header
+        checkPageBreak(30);
         page.drawLine({ start: { x: 40, y: currentY - 5 }, end: { x: width - 40, y: currentY - 5 }, color: lightGray, thickness: 1 });
-        page.drawText(item.version.substring(0, 45), { x: 50, y: currentY, size: 9, font: font, color: blackColor });
-        page.drawText(item.quantity.toLocaleString('es-ES') + ' ej.', { x: 300, y: currentY, size: 9, font: boldFont, color: blackColor });
-        page.drawText(item.address.substring(0, 35), { x: 380, y: currentY, size: 8, font: font, color: grayColor });
+        page.drawText(item.quantity.toLocaleString('es-ES') + ' ej.', { x: 50, y: currentY, size: 9, font: boldFont, color: blackColor });
+        page.drawText(item.version.substring(0, 35), { x: 220, y: currentY, size: 8, font: font, color: blackColor });
+        page.drawText(item.address.substring(0, 45), { x: 380, y: currentY, size: 7.5, font: font, color: grayColor });
         currentY -= 20;
 
         const itemPallets = item.customPallets || calculatePalletsForQuantity(item.quantity, Number(albaranesFullPalletSize) || 21000, Number(albaranesMinPico) || 100);
@@ -797,7 +857,7 @@ export default function App() {
         itemPallets.forEach((pallet, pIdx) => {
           checkPageBreak(15);
           const isPalletPico = pallet.quantity < (Number(albaranesFullPalletSize) || 21000);
-          page.drawText(`|- Palet ${pIdx + 1}${isPalletPico ? ' (Pico)' : ''} : ${pallet.quantity.toLocaleString('es-ES')} ej.`, { x: 60, y: currentY, size: 8, font: font, color: grayColor });
+          page.drawText(`|- Palet ${pIdx + 1}${isPalletPico ? ' (Pico)' : ''} : ${pallet.quantity.toLocaleString('es-ES')} ej.`, { x: 230, y: currentY, size: 8, font: font, color: grayColor });
           currentY -= 14;
         });
         currentY -= 6;
@@ -807,30 +867,14 @@ export default function App() {
       page.drawLine({ start: { x: 40, y: currentY }, end: { x: width - 40, y: currentY }, color: rgb(0, 0, 0), thickness: 2 });
       currentY -= 20;
       
-      // Under "VERSIÓN / PRODUCTO" column
-      page.drawText('TOTAL PALETS:', { x: 50, y: currentY, size: 10, font: boldFont, color: blackColor });
-      page.drawText(`${totalPalletsCount} PALET${totalPalletsCount !== 1 ? 'S' : ''}`, { x: 145, y: currentY, size: 10, font: boldFont, color: accentColor });
+      // Totals
+      page.drawText('Nº palés:', { x: 50, y: currentY, size: 10, font: boldFont, color: blackColor });
+      page.drawText(`${totalPalletsCount} palé(s)`, { x: 105, y: currentY, size: 10, font: boldFont, color: accentColor });
 
-      // Under "CANTIDAD" column
-      page.drawText('TOTAL EJEMPLARES:', { x: 300, y: currentY, size: 10, font: boldFont, color: blackColor });
-      page.drawText(`${totalQty.toLocaleString('es-ES')} ej.`, { x: 420, y: currentY, size: 10, font: boldFont, color: accentColor });
+      page.drawText('TOTAL EJEMPLARES:', { x: 220, y: currentY, size: 10, font: boldFont, color: blackColor });
+      page.drawText(`${totalQty.toLocaleString('es-ES')} ej.`, { x: 340, y: currentY, size: 10, font: boldFont, color: accentColor });
 
-      const footerY = 160;
-      
-      // Observations block
-      page.drawRectangle({ x: 40, y: footerY - 50, width: width - 300, height: 40, color: rgb(0.96,0.96,0.96), borderColor: grayColor, borderWidth: 1 });
-      page.drawText('OBSERVACIONES:', { x: 50, y: footerY - 20, size: 9, font: boldFont, color: grayColor });
-      
-      const transportObs = Array.from(new Set(transportItems.map(it => it.barcode).filter(Boolean))).join(' | ');
-      if (transportObs) {
-        page.drawText(transportObs.length > 80 ? transportObs.substring(0, 80) + '...' : transportObs, { x: 140, y: footerY - 20, size: 8, font: font, color: blackColor });
-      }
-      
-      // Signature block
-      page.drawRectangle({ x: 40, y: 40, width: width - 80, height: footerY - 40, color: rgb(0.97, 0.97, 0.97), borderColor: lightGray, borderWidth: 1 });
-      page.drawText('FIRMA DE RECEPCIÓN Y SELLO:', { x: width - 250, y: footerY - 20, size: 9, font: boldFont, color: grayColor });
-      page.drawLine({ start: { x: width - 250, y: 70 }, end: { x: width - 60, y: 70 }, color: grayColor, thickness: 1 });
-      page.drawText('Nombre / DNI / Fecha', { x: width - 200, y: 55, size: 7, font: font, color: grayColor });
+      drawFooter();
     }
 
     return await pdfDoc.save();
@@ -1061,10 +1105,26 @@ export default function App() {
     setSuccessMsg('Lista de partidas vaciada.');
   };
 
+  const handleResetApp = () => {
+    setDistributionList([]);
+    setPdfFileBytes(null);
+    setPdfFileName('');
+    setAlbaranesPdfFileBytes(null);
+    setAlbaranesPdfFileName('');
+    setTransports([]);
+    setEtiquetasPreviewUrl(null);
+    setAlbaranesPreviewUrl(null);
+    if (excelInputRef.current) excelInputRef.current.value = '';
+    if (pdfInputRef.current) pdfInputRef.current.value = '';
+    setSuccessMsg('Aplicación reiniciada correctamente. Lista para nuevos datos.');
+  };
+
   const handleSaveCustomPallets = (pallets: PalletResult[]) => {
     if (editingPalletItemIndex === null) return;
     const newList = [...distributionList];
+    const newTotal = pallets.reduce((sum, p) => sum + p.quantity, 0);
     newList[editingPalletItemIndex].customPallets = pallets;
+    newList[editingPalletItemIndex].quantity = newTotal; // Approve balance and recalculate total
     setDistributionList(newList);
     setSuccessMsg(`Palets ajustados manualmente para la partida: ${newList[editingPalletItemIndex].version}`);
   };
@@ -1133,26 +1193,31 @@ export default function App() {
           }
         });
       } else {
-        const safeAlbaranesFullPalletSize = typeof albaranesFullPalletSize === 'number' ? albaranesFullPalletSize : 21000;
-        const safeAlbaranesMinPico = typeof albaranesMinPico === 'number' ? albaranesMinPico : 2800;
-        outputBytes = await generateAlbaranesPdf({
-          fullPalletSize: safeAlbaranesFullPalletSize,
-          minPico: safeAlbaranesMinPico,
-          items: distributionList,
-          transports,
-          pdfBytes: activePdf,
-          textTemplate: albaranesTextTemplate,
-          fontSize: albaranesFontSize,
-          textColor: albaranesTextColor,
-          positionY: albaranesPositionY,
-          positionX: albaranesPositionX,
-          centerAlign: albaranesCenterAlign,
-          isGeneratedTemplate: albaranesPdfFileName.includes('Original.pdf'),
-          maquetaStyles,
-          onProgress: (prog) => {
-            setPdfProgress(prog);
-          }
-        });
+        if (albaranesPdfFileName.includes('Original.pdf')) {
+          outputBytes = new Uint8Array(activePdf);
+          setPdfProgress(100);
+        } else {
+          const safeAlbaranesFullPalletSize = typeof albaranesFullPalletSize === 'number' ? albaranesFullPalletSize : 21000;
+          const safeAlbaranesMinPico = typeof albaranesMinPico === 'number' ? albaranesMinPico : 2800;
+          outputBytes = await generateAlbaranesPdf({
+            fullPalletSize: safeAlbaranesFullPalletSize,
+            minPico: safeAlbaranesMinPico,
+            items: distributionList,
+            transports,
+            pdfBytes: activePdf,
+            textTemplate: albaranesTextTemplate,
+            fontSize: albaranesFontSize,
+            textColor: albaranesTextColor,
+            positionY: albaranesPositionY,
+            positionX: albaranesPositionX,
+            centerAlign: albaranesCenterAlign,
+            isGeneratedTemplate: false,
+            maquetaStyles,
+            onProgress: (prog) => {
+              setPdfProgress(prog);
+            }
+          });
+        }
       }
 
       // Save blob files
@@ -1233,6 +1298,13 @@ export default function App() {
               title="Carga una distribución con variaciones de marcas e idiomas de ejemplo"
             >
               Cargar Ejemplo Completo
+            </button>
+            <button
+              onClick={handleResetApp}
+              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-950 text-red-300 border border-red-900/40 hover:bg-red-900/60 transition"
+              title="Reiniciar aplicación para introducir nuevos datos"
+            >
+              Reset App
             </button>
           </div>
         </div>
@@ -1564,7 +1636,7 @@ export default function App() {
                     </tr>
                   ) : (
                     distributionList.map((item, index) => {
-                      const calculatedPallets = calculatePalletsForQuantity(item.quantity, activeFullPalletSize, activeMinPico);
+                      const calculatedPallets = item.customPallets || calculatePalletsForQuantity(item.quantity, activeFullPalletSize, activeMinPico);
                       const isItemActive = selectedPreviewItemIdx === index;
                       
                       return (
