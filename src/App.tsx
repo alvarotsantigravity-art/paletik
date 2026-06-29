@@ -1354,7 +1354,7 @@ export default function App() {
 
       {/* API Key settings panel */}
       {showSettings && (
-        <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-3 animate-fade-in">
+        <div className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-6 py-3 animate-fade-in">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex-1">
               <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
@@ -1371,7 +1371,7 @@ export default function App() {
                 value={geminiApiKey}
                 onChange={(e) => setGeminiApiKey(e.target.value)}
                 placeholder="Clave API (AI Studio)..."
-                className="w-full sm:w-80 bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-rose-500 font-mono"
+                className="w-full sm:w-80 bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded px-2.5 py-1.5 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-rose-500 font-mono"
               />
               {geminiApiKey ? (
                 <button
@@ -1453,11 +1453,11 @@ export default function App() {
         
         {/* UPPER/FORMULA PANEL (IF EXPANDED) */}
         {showFormulaExplanation && (
-          <div className="col-span-12 bg-zinc-900 border border-rose-500/30 rounded-xl p-5 relative overflow-hidden transition-all animate-fade-in">
+          <div className="col-span-12 bg-white dark:bg-zinc-900 border border-rose-500/30 rounded-xl p-5 relative overflow-hidden transition-all animate-fade-in shadow-sm">
             <div className="absolute right-4 top-4">
               <button 
                 onClick={() => setShowFormulaExplanation(false)}
-                className="text-zinc-400 hover:text-white p-1 rounded-full hover:bg-zinc-800"
+                className="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1471,23 +1471,23 @@ export default function App() {
               Si este resto <code className="text-rose-400 font-mono bg-zinc-950 px-1 py-0.5 rounded">R</code> es menor que el valor personalizable de pico mínimo <code className="text-rose-400 font-mono bg-zinc-950 px-1 py-0.5 rounded">M</code> (por ejemplo, 2.800 ejemplares), el sistema balancea la carga automáticamente:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 max-w-5xl">
-              <div className="bg-zinc-950 p-3 rounded border border-zinc-800 text-xs">
-                <span className="font-semibold text-rose-400 block mb-1">Caso Estándar (R ≥ M):</span>
-                Si el resto supera el mínimo, se asignan <code className="bg-zinc-900 text-zinc-100 px-1 rounded">k</code> palets llenos a capacidad máxima y <code className="bg-zinc-900 text-zinc-100 px-1 rounded">1</code> palet final pico con el remanente <code className="text-amber-400 font-mono">R</code>.
+              <div className="bg-zinc-50 dark:bg-zinc-950 p-3 rounded border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300">
+                <span className="font-semibold text-rose-500 dark:text-rose-400 block mb-1">Caso Estándar (R ≥ M):</span>
+                Si el resto supera el mínimo, se asignan <code className="bg-zinc-200 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 px-1 rounded">k</code> palets llenos a capacidad máxima y <code className="bg-zinc-200 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 px-1 rounded">1</code> palet final pico con el remanente <code className="text-amber-600 dark:text-amber-400 font-mono">R</code>.
               </div>
-              <div className="bg-zinc-950 p-3 rounded border border-zinc-800 text-xs">
-                <span className="font-semibold text-rose-400 block mb-1">Caso Balanceado (R &lt; M):</span>
-                Se toman ejemplares prestados del último palet completo para engrosar el resto hasta llegar exactamente a <code className="text-emerald-400 font-mono">M</code>. El penúltimo palet pasa a cargar <code className="text-amber-400 font-mono">F - (M - R)</code>, cumpliendo así el mínimo legal en ambos.
+              <div className="bg-zinc-50 dark:bg-zinc-950 p-3 rounded border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300">
+                <span className="font-semibold text-rose-500 dark:text-rose-400 block mb-1">Caso Balanceado (R &lt; M):</span>
+                Se toman ejemplares prestados del último palet completo para engrosar el resto hasta llegar exactamente a <code className="text-emerald-600 dark:text-emerald-400 font-mono">M</code>. El penúltimo palet pasa a cargar <code className="text-amber-600 dark:text-amber-400 font-mono">F - (M - R)</code>, cumpliendo así el mínimo legal en ambos.
               </div>
             </div>
-            <p className="text-xs text-zinc-400 mt-3 italic">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-3 italic">
               * Si el total general es muy pequeño o el ajuste no es viable numéricamente, el algoritmo reparte el residuo de forma equitativa.
             </p>
           </div>
         )}
 
         {/* System parameters settings */}
-        <section className="col-span-12 bg-zinc-900 p-5 rounded-xl border border-zinc-800">
+        <section className="col-span-12 bg-white dark:bg-zinc-900 p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             {/* Campo 1: Capacidad Palet */}
             <div className="md:col-span-4">
@@ -1503,10 +1503,10 @@ export default function App() {
                     setParamsAreDirty(true);
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleApplyParams(); }}
-                  className={`w-full bg-zinc-950 border rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-1 ${
+                  className={`w-full bg-zinc-50 dark:bg-zinc-950 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-white font-mono focus:outline-none focus:ring-1 ${
                     paramsAreDirty
-                      ? 'border-amber-500/70 focus:border-amber-400 focus:ring-amber-500/40'
-                      : 'border-zinc-700 focus:border-rose-500 focus:ring-rose-500'
+                      ? 'border-amber-400 dark:border-amber-500/70 focus:border-amber-500 dark:focus:border-amber-400 focus:ring-amber-500/40'
+                      : 'border-zinc-300 dark:border-zinc-700 focus:border-apple-blue dark:focus:border-rose-500 focus:ring-apple-blue/20 dark:focus:ring-rose-500'
                   }`}
                   placeholder="Ej. 21000"
                 />
@@ -1529,10 +1529,10 @@ export default function App() {
                     setParamsAreDirty(true);
                   }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleApplyParams(); }}
-                  className={`w-full bg-zinc-950 border rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-1 ${
+                  className={`w-full bg-zinc-50 dark:bg-zinc-950 border rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-white font-mono focus:outline-none focus:ring-1 ${
                     paramsAreDirty
-                      ? 'border-amber-500/70 focus:border-amber-400 focus:ring-amber-500/40'
-                      : 'border-zinc-700 focus:border-rose-500 focus:ring-rose-500'
+                      ? 'border-amber-400 dark:border-amber-500/70 focus:border-amber-500 dark:focus:border-amber-400 focus:ring-amber-500/40'
+                      : 'border-zinc-300 dark:border-zinc-700 focus:border-apple-blue dark:focus:border-rose-500 focus:ring-apple-blue/20 dark:focus:ring-rose-500'
                   }`}
                   placeholder="Ej. 2800"
                 />
@@ -1896,8 +1896,8 @@ export default function App() {
         <div className="col-span-12 lg:col-span-6 flex flex-col gap-6">
           
           {/* PDF Template inputs */}
-          <div className="bg-zinc-900 rounded-xl border border-zinc-850 p-5">
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider mb-4 flex items-center justify-between">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-white uppercase tracking-wider mb-4 flex items-center justify-between">
               <span>{activeTab === 'etiquetas' ? 'Etiquetas' : 'Albaranes'} PDF original del cliente</span>
               <span className="text-xs text-zinc-400 font-medium">Ficheros de reparto</span>
             </h2>
@@ -1907,7 +1907,7 @@ export default function App() {
                 <div className="sm:col-span-8">
                   <div 
                     onClick={() => pdfInputRef.current?.click()}
-                    className="border-2 border-dashed border-zinc-700 hover:border-zinc-500 cursor-pointer rounded-lg p-3 flex items-center gap-3 bg-zinc-950/60 hover:bg-zinc-900 transition-colors"
+                    className="border-2 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 cursor-pointer rounded-lg p-3 flex items-center gap-3 bg-zinc-50 dark:bg-zinc-950/60 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
                   >
                     <input 
                       type="file" 
@@ -1918,7 +1918,7 @@ export default function App() {
                     />
                     <FileText className="w-6 h-6 text-rose-500 shrink-0" />
                     <div className="text-left flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-zinc-200 truncate">
+                      <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-200 truncate">
                         {(activeTab === 'etiquetas' ? pdfFileName : albaranesPdfFileName) || `Subir ${activeTab === 'etiquetas' ? 'etiquetas' : 'albaranes'} original (.pdf)`}
                       </p>
                       <p className="text-[10px] text-zinc-500">
@@ -1981,12 +1981,12 @@ export default function App() {
               })()}
 
               {(activeTab === 'etiquetas' ? pdfFileBytes : albaranesPdfFileBytes) && (
-                <div className="mt-1 p-3 bg-zinc-950 rounded-lg border border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-3">
+                <div className="mt-1 p-3 bg-zinc-50 dark:bg-zinc-950 rounded-lg border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-3 shadow-sm">
                   <div className="flex items-center gap-2.5 mr-auto">
-                    <BrainCircuit className={`w-5 h-5 text-emerald-400 shrink-0 ${isAnalyzingPdf ? 'animate-pulse text-rose-500' : ''}`} />
+                    <BrainCircuit className={`w-5 h-5 text-emerald-500 dark:text-emerald-400 shrink-0 ${isAnalyzingPdf ? 'animate-pulse text-rose-500' : ''}`} />
                     <div className="text-left font-sans">
-                      <p className="text-xs font-semibold text-zinc-200">PDF cargado: <span className="font-mono text-emerald-400 text-[11px]">{activeTab === 'etiquetas' ? pdfFileName : albaranesPdfFileName}</span></p>
-                      <p className="text-[10px] text-zinc-400">¿Quieres extraer la versión, dirección y tirada de cada página del PDF de forma local, instantánea y gratuita?</p>
+                      <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-200">PDF cargado: <span className="font-mono text-emerald-600 dark:text-emerald-400 text-[11px]">{activeTab === 'etiquetas' ? pdfFileName : albaranesPdfFileName}</span></p>
+                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400">¿Quieres extraer la versión, dirección y tirada de cada página del PDF de forma local, instantánea y gratuita?</p>
                     </div>
                   </div>
                   <button
@@ -2021,9 +2021,9 @@ export default function App() {
           </div>
 
           {/* Stamping Layout customizer */}
-          <div className="bg-zinc-900 rounded-xl border border-zinc-850 p-5 flex-1 flex flex-col gap-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 flex-1 flex flex-col gap-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-1.5">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                 <Sliders className="w-4 h-4 text-rose-500" />
                 <span>Configuración del Sello ({activeTab === 'etiquetas' ? 'Etiquetas' : 'Albaranes'})</span>
               </h2>
@@ -2035,14 +2035,14 @@ export default function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               {/* Remitente Info */}
-              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-zinc-950/50 p-3 rounded border border-zinc-800">
+              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-zinc-50 dark:bg-zinc-950/50 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-sm">
                 <div>
-                  <label className="text-xs text-zinc-400 font-semibold block mb-1">Empresa / Remitente (Cabecera)</label>
+                  <label className="text-xs text-zinc-600 dark:text-zinc-400 font-bold block mb-1.5">Empresa / Remitente (Cabecera)</label>
                   <input 
                     type="text"
                     value={senderName}
                     onChange={(e) => setSenderName(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-white focus:border-rose-500 focus:outline-none font-bold"
+                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-900 dark:text-white focus:border-apple-blue dark:focus:border-rose-500 focus:outline-none font-bold shadow-sm transition-colors"
                     placeholder="Ej: MI EMPRESA S.A."
                   />
                 </div>
@@ -2052,15 +2052,15 @@ export default function App() {
                     value={senderDetails}
                     onChange={(e) => setSenderDetails(e.target.value)}
                     rows={2}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded px-2.5 py-1.5 text-[10px] text-white focus:border-rose-500 focus:outline-none leading-tight"
+                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded px-2.5 py-1.5 text-[10px] text-zinc-900 dark:text-white focus:border-apple-blue dark:focus:border-rose-500 focus:outline-none leading-tight shadow-sm"
                     placeholder="Línea 1&#10;Línea 2..."
                   />
                 </div>
               </div>
 
               {/* Estilos Individuales Maqueta */}
-              <div className="sm:col-span-2 bg-zinc-950/50 p-3 rounded border border-zinc-800">
-                <label className="text-xs text-zinc-400 font-semibold block mb-3">Personalización de Campos de la Maqueta</label>
+              <div className="sm:col-span-2 bg-zinc-50 dark:bg-zinc-950/50 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <label className="text-xs text-zinc-600 dark:text-zinc-400 font-bold block mb-3">Personalización de Campos de la Maqueta</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {[
                     { key: 'header', label: 'Empresa (Cabecera)' },
@@ -2071,14 +2071,14 @@ export default function App() {
                     { key: 'palletNo', label: 'Nº de Palet' },
                     { key: 'totalQty', label: 'Tirada Total' },
                   ].map((field) => (
-                    <div key={field.key} className="bg-zinc-900/50 p-2 rounded border border-zinc-800/50 flex flex-col justify-between">
-                      <div className="text-[10px] text-zinc-300 font-medium mb-1.5">{field.label}</div>
+                    <div key={field.key} className="bg-white dark:bg-zinc-900/50 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800/50 flex flex-col justify-between shadow-sm">
+                      <div className="text-[10px] text-zinc-600 dark:text-zinc-300 font-bold mb-1.5">{field.label}</div>
                       <div className="flex items-center gap-2">
                         <input 
                           type="color"
                           value={maquetaStyles[field.key as keyof typeof maquetaStyles].color}
                           onChange={(e) => setMaquetaStyles({...maquetaStyles, [field.key]: { ...maquetaStyles[field.key as keyof typeof maquetaStyles], color: e.target.value }})}
-                          className="w-5 h-5 rounded cursor-pointer bg-zinc-900 border-0 p-0"
+                          className="w-5 h-5 rounded cursor-pointer bg-zinc-200 dark:bg-zinc-900 border-0 p-0"
                           title="Color del texto"
                         />
                         <div className="flex-1 flex items-center gap-1">
@@ -2111,7 +2111,7 @@ export default function App() {
                   value={activeTab === 'etiquetas' ? textTemplate : albaranesTextTemplate} 
                   onChange={(e) => activeTab === 'etiquetas' ? setTextTemplate(e.target.value) : setAlbaranesTextTemplate(e.target.value)}
                   rows={3}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1.5 text-xs text-white font-mono focus:border-rose-500 focus:outline-none"
+                  className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-900 dark:text-white font-mono focus:border-apple-blue dark:focus:border-rose-500 focus:outline-none shadow-sm"
                   placeholder="Introduce texto con variables..."
                 />
                 
@@ -2235,7 +2235,7 @@ export default function App() {
                         setAlbaranesTextColor(val);
                       }
                     }}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1 text-xs font-mono" 
+                    className="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg px-2.5 py-1 text-xs font-mono text-zinc-900 dark:text-white shadow-sm" 
                   />
                 </div>
               </div>
@@ -2285,9 +2285,9 @@ export default function App() {
             </div>
 
             {/* Simulated Live preview frame OR real PDF iframe embedded with Chrome Sandbox Bypasses */}
-            <div className="border border-zinc-800 bg-zinc-950 rounded-lg overflow-hidden flex flex-col flex-1 min-h-[480px] relative">
-              <div className="bg-zinc-900 px-3 py-2.5 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 border-b border-zinc-800">
-                <div className="flex items-center gap-2 text-xs text-zinc-300">
+            <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-lg overflow-hidden flex flex-col flex-1 min-h-[480px] relative shadow-sm">
+              <div className="bg-zinc-50 dark:bg-zinc-900 px-3 py-2.5 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 border-b border-zinc-200 dark:border-zinc-800">
+                <div className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
                   <FileCheck className="w-4 h-4 text-emerald-400" />
                   <span className="font-semibold text-zinc-200">Previsualizador de la Marca Impresa</span>
                   <span className="text-[10px] font-mono bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded">
@@ -2321,7 +2321,7 @@ export default function App() {
               </div>
 
               {/* View Modes Rendering */}
-              <div className="flex-1 flex items-center justify-center p-3 sm:p-5 overflow-auto bg-zinc-950">
+              <div className="flex-1 flex items-center justify-center p-3 sm:p-5 overflow-auto bg-zinc-100 dark:bg-zinc-950">
                   {/* Lector PDF Real Mode iframe */}
                   {activePreviewUrl ? (
                     <div className="w-full h-[600px] relative flex flex-col justify-between">
@@ -2362,12 +2362,12 @@ export default function App() {
           )}
 
           {isProcessingPdf && (
-            <div className="bg-zinc-900 p-5 rounded-xl border border-zinc-800 flex flex-col gap-3 animate-pulse mb-4">
-              <div className="flex justify-between text-xs text-zinc-300 font-medium">
+            <div className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 flex flex-col gap-3 animate-pulse mb-4 shadow-sm">
+              <div className="flex justify-between text-xs text-zinc-700 dark:text-zinc-300 font-bold">
                 <span>{activeTab === 'etiquetas' ? 'Calculando palets por partida y duplicando páginas en el PDF...' : 'Marcando albaranes originales página a página...'}</span>
                 <span>{pdfProgress}%</span>
               </div>
-              <div className="w-full bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-800">
+              <div className="w-full bg-zinc-100 dark:bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-200 dark:border-zinc-800">
                 <div 
                   className="bg-gradient-to-r from-rose-500 to-amber-500 h-full transition-all duration-300" 
                   style={{ width: `${pdfProgress}%` }}
@@ -2421,7 +2421,7 @@ export default function App() {
               <div className="mt-2 flex flex-col items-center gap-4">
 
                 {/* Checklist de requisitos */}
-                <div className="w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+                <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-2">
                       <Sliders className="w-3.5 h-3.5 text-rose-400" />
@@ -2443,8 +2443,8 @@ export default function App() {
                         key={idx}
                         className={`flex items-start gap-2.5 px-3 py-2 rounded-lg border text-xs transition-all ${
                           check.ok
-                            ? 'bg-emerald-950/30 border-emerald-700/30 text-emerald-300'
-                            : 'bg-zinc-950 border-zinc-800 text-zinc-400'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-700/30 text-emerald-800 dark:text-emerald-300'
+                            : 'bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400'
                         }`}
                       >
                         <span className={`mt-0.5 shrink-0 text-base leading-none ${check.ok ? 'text-emerald-400' : 'text-zinc-600'}`}>
@@ -2511,7 +2511,7 @@ export default function App() {
       />
 
 
-      <footer className="border-t border-zinc-900 bg-zinc-950 py-6 text-center text-xs text-zinc-600 mt-12">
+      <footer className="border-t border-zinc-200 dark:border-zinc-900 bg-white dark:bg-zinc-950 py-6 text-center text-xs text-zinc-500 dark:text-zinc-600 mt-12">
         <p>© 2026 Gestor de Paletizado & Logística. Algoritmo de optimización automática de picos para impresión rápida.</p>
       </footer>
     </div>

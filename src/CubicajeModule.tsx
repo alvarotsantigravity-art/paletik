@@ -1501,7 +1501,7 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
             className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border ${
               showComparator
                 ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-950/30'
-                : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-indigo-500 hover:bg-zinc-800'
+                : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-indigo-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 shadow-sm'
             }`}
           >
             <ArrowLeftRight className="w-3.5 h-3.5" />
@@ -1511,23 +1511,23 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={handleExportPNG}
-              className="py-2.5 px-2 rounded-xl text-[11px] font-bold bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500 hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5"
+              className="py-2.5 px-2 rounded-xl text-[11px] font-bold bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 shadow-sm"
             >
-              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <Download className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               Exportar PNG
             </button>
             <button
               onClick={handleExportExcel}
-              className="py-2.5 px-2 rounded-xl text-[11px] font-bold bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500 hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5"
+              className="py-2.5 px-2 rounded-xl text-[11px] font-bold bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 shadow-sm"
             >
-              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <Download className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               Exportar Excel
             </button>
             <button
               onClick={handleExportPDF}
-              className="py-2.5 px-2 rounded-xl text-[11px] font-bold bg-zinc-900 text-zinc-300 border border-zinc-700 hover:border-emerald-500 hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5"
+              className="py-2.5 px-2 rounded-xl text-[11px] font-bold bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 shadow-sm"
             >
-              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <Download className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               Exportar PDF
             </button>
           </div>
@@ -1538,9 +1538,9 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
       <div className="col-span-12 lg:col-span-7 flex flex-col gap-5">
 
         {/* ─── Summary KPIs ─── */}
-        <section className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-emerald-400" />
+        <section className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
             Resultado del Cubicaje
             <span className="text-[10px] font-normal text-zinc-500 ml-auto">
               {palletType === 'european' ? '🇪🇺 Europeo 1200×800' : '🇺🇸 Americano 1200×1000'}
@@ -1548,33 +1548,33 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
           </h3>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
+            <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-center shadow-sm">
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block mb-0.5">Por Capa</span>
-              <span className="text-2xl font-extrabold text-blue-400 font-mono block">{result.brochuresPerLayer}</span>
+              <span className="text-2xl font-extrabold text-blue-500 dark:text-blue-400 font-mono block">{result.brochuresPerLayer}</span>
               <span className="text-[9px] text-zinc-500">paquetes</span>
             </div>
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
+            <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-center shadow-sm">
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block mb-0.5">Capas</span>
-              <span className="text-2xl font-extrabold text-amber-400 font-mono block">{result.layersCount}</span>
+              <span className="text-2xl font-extrabold text-amber-500 dark:text-amber-400 font-mono block">{result.layersCount}</span>
               <span className="text-[9px] text-zinc-500">capas</span>
             </div>
-            <div className={`bg-zinc-950 border rounded-xl p-3 text-center ${result.exceedsHeight ? 'border-red-500/60' : 'border-zinc-800'}`}>
+            <div className={`bg-zinc-50 dark:bg-zinc-950 border rounded-xl p-3 text-center shadow-sm ${result.exceedsHeight ? 'border-red-500/60' : 'border-zinc-200 dark:border-zinc-800'}`}>
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block mb-0.5">Altura Total</span>
-              <span className={`text-2xl font-extrabold font-mono block ${result.exceedsHeight ? 'text-red-400' : 'text-amber-400'}`}>
+              <span className={`text-2xl font-extrabold font-mono block ${result.exceedsHeight ? 'text-red-500 dark:text-red-400' : 'text-amber-500 dark:text-amber-400'}`}>
                 {Math.round(result.layersCount * result.packageHeightMm + PALLET_STRUCTURE_HEIGHT)}
               </span>
               <span className="text-[9px] text-zinc-500">
                 mm {result.exceedsHeight && '⚠️'}
               </span>
             </div>
-            <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
+            <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-center shadow-sm">
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block mb-0.5">Total Palet</span>
-              <span className="text-2xl font-extrabold text-emerald-400 font-mono block">{formatQuantitySpain(result.totalBrochures)}</span>
+              <span className="text-2xl font-extrabold text-emerald-500 dark:text-emerald-400 font-mono block">{formatQuantitySpain(result.totalBrochures)}</span>
               <span className="text-[9px] text-zinc-500">folletos</span>
             </div>
-            <div className={`bg-zinc-950 border rounded-xl p-3 text-center ${result.exceedsWeight ? 'border-red-500/60' : 'border-zinc-800'}`}>
+            <div className={`bg-zinc-50 dark:bg-zinc-950 border rounded-xl p-3 text-center shadow-sm ${result.exceedsWeight ? 'border-red-500/60' : 'border-zinc-200 dark:border-zinc-800'}`}>
               <span className="text-[9px] text-zinc-500 font-semibold uppercase block mb-0.5">Peso Total</span>
-              <span className={`text-2xl font-extrabold font-mono block ${result.exceedsWeight ? 'text-red-400' : 'text-rose-400'}`}>
+              <span className={`text-2xl font-extrabold font-mono block ${result.exceedsWeight ? 'text-red-500 dark:text-red-400' : 'text-rose-500 dark:text-rose-400'}`}>
                 {result.totalWeightKg.toFixed(1)}
               </span>
               <span className={`text-[9px] ${result.exceedsWeight ? 'text-red-400 font-bold' : 'text-zinc-500'}`}>
@@ -1585,8 +1585,8 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
 
           {/* Efficiency bar */}
           <div className="flex items-center gap-3">
-            <span className="text-[10px] text-zinc-400 font-semibold shrink-0">Eficiencia base:</span>
-            <div className="flex-1 bg-zinc-950 rounded-full h-3 overflow-hidden border border-zinc-800">
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-semibold shrink-0">Eficiencia base:</span>
+            <div className="flex-1 bg-zinc-100 dark:bg-zinc-950 rounded-full h-3 overflow-hidden border border-zinc-200 dark:border-zinc-800">
               <div
                 className={`h-full transition-all duration-500 rounded-full ${
                   result.efficiencyPercent >= 85 ? 'bg-gradient-to-r from-emerald-500 to-green-400' :
@@ -1606,16 +1606,16 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
           </div>
 
           {/* COG Status card */}
-          <div className="mt-4 p-3 bg-zinc-950/80 border border-zinc-800 rounded-lg flex flex-col gap-2">
+          <div className="mt-4 p-3 bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col gap-2 shadow-sm">
             <span className="text-[9px] text-zinc-500 font-semibold uppercase block tracking-wider">Centro de Gravedad (COG)</span>
             <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div className="bg-zinc-900/60 p-1.5 rounded border border-zinc-800/40 text-center">
+              <div className="bg-white dark:bg-zinc-900/60 p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800/40 text-center shadow-sm">
                 <span className="text-zinc-500 block text-[8px] uppercase">Izq / Der</span>
-                <span className={`font-bold ${result.cogImbalance ? 'text-amber-400' : 'text-emerald-400'}`}>
+                <span className={`font-bold ${result.cogImbalance ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-500 dark:text-emerald-400'}`}>
                   {result.cogLeftPct}% / {result.cogRightPct}%
                 </span>
               </div>
-              <div className="bg-zinc-900/60 p-1.5 rounded border border-zinc-800/40 text-center">
+              <div className="bg-white dark:bg-zinc-900/60 p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800/40 text-center shadow-sm">
                 <span className="text-zinc-500 block text-[8px] uppercase">Sup / Inf</span>
                 <span className={`font-bold ${result.cogImbalance ? 'text-amber-400' : 'text-emerald-400'}`}>
                   {result.cogTopPct}% / {result.cogBottomPct}%
@@ -1667,10 +1667,10 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
         </section>
 
         {/* ─── Visual: Top View (Origami) ─── */}
-        <section className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
+        <section className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <Maximize2 className="w-4 h-4 text-blue-400" />
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+              <Maximize2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
               Vista Cenital del Palet (Planta)
             </h3>
             <div className="flex items-center gap-1.5 text-[9px] text-zinc-500">
@@ -1680,9 +1680,9 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
           </div>
 
           {/* Mode Selector and Toolbar */}
-          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 mb-4 bg-zinc-950 p-2 rounded-xl border border-zinc-800">
+          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 mb-4 bg-zinc-50 dark:bg-zinc-950 p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
             <div className="flex items-center gap-2 self-start w-full sm:w-auto">
-              <div className="flex bg-zinc-900 p-0.5 rounded-lg border border-zinc-800">
+              <div className="flex bg-white dark:bg-zinc-900 p-0.5 rounded-lg border border-zinc-200 dark:border-zinc-800">
                 <button
                   onClick={() => handleSetLayoutMode('automatic')}
                   disabled={isLayoutLocked}
@@ -1712,8 +1712,8 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
                   onClick={() => setIsLayoutLocked(!isLayoutLocked)}
                   className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 ${
                     isLayoutLocked
-                      ? 'bg-amber-950/30 text-amber-400 border-amber-500/30 shadow-md'
-                      : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-white'
+                      ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/30 shadow-md'
+                      : 'bg-white dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-900 dark:hover:text-white'
                   }`}
                   title={isLayoutLocked ? "Diseño bloqueado. Haz clic para desbloquear." : "Bloquear diseño para evitar cambios accidentales."}
                 >
@@ -1737,25 +1737,25 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
                 <button
                   onClick={handleAddBrochure}
                   disabled={isLayoutLocked}
-                  className="px-2 py-1 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 rounded-lg text-[10px] text-zinc-300 hover:text-white font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 disabled:hover:border-zinc-800 disabled:hover:text-zinc-300"
+                  className="px-2 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg text-[10px] text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent shadow-sm"
                   title="Añade un nuevo folleto en el primer espacio libre disponible"
                 >
-                  <Plus className="w-3 h-3 text-rose-400" />
+                  <Plus className="w-3 h-3 text-rose-500 dark:text-rose-400" />
                   Añadir
                 </button>
                 <button
                   onClick={handleResetToAutomatic}
                   disabled={isLayoutLocked}
-                  className="px-2 py-1 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 rounded-lg text-[10px] text-zinc-300 hover:text-white font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 disabled:hover:border-zinc-800 disabled:hover:text-zinc-300"
+                  className="px-2 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg text-[10px] text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent shadow-sm"
                   title="Carga la disposición automática actual como punto de partida manual"
                 >
-                  <RotateCcw className="w-3 h-3 text-amber-400" />
+                  <RotateCcw className="w-3 h-3 text-amber-500 dark:text-amber-400" />
                   Cargar Auto
                 </button>
                 <button
                   onClick={handleClearBase}
                   disabled={isLayoutLocked}
-                  className="px-2 py-1 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800 rounded-lg text-[10px] text-red-400 hover:text-red-300 font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 disabled:hover:border-zinc-800 disabled:hover:text-red-400"
+                  className="px-2 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-red-50 dark:hover:bg-zinc-800 rounded-lg text-[10px] text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-bold flex items-center gap-1 transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent shadow-sm"
                   title="Elimina todos los folletos de la base"
                 >
                   <Trash2 className="w-3 h-3" />
@@ -1774,7 +1774,7 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
                   <strong>Estabilidad de Pico Activada (Base de Apoyo):</strong> La altura de la estiba es baja ({Math.round(result.layersCount * result.packageHeightMm + PALLET_STRUCTURE_HEIGHT)} mm, &lt;60%). Se recomienda aplicar <strong>estiba cruzada</strong> alternando la orientación en cada capa para evitar que el palet colapse.
                 </span>
               </div>
-              <div className="flex items-center gap-2 justify-center bg-zinc-950 p-1 rounded-lg border border-zinc-800 max-w-[240px] mx-auto w-full">
+              <div className="flex items-center gap-2 justify-center bg-zinc-100 dark:bg-zinc-950 p-1 rounded-lg border border-zinc-200 dark:border-zinc-800 max-w-[240px] mx-auto w-full">
                 <button
                   onClick={() => setSelectedLayer('A')}
                   className={`flex-1 py-1.5 text-[10px] font-bold rounded-md transition-all ${
@@ -1821,9 +1821,9 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
         </section>
 
         {/* ─── Visual: Side View ─── */}
-        <section className="bg-zinc-900 rounded-xl border border-zinc-800 p-5">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-amber-400" />
+        <section className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-amber-500 dark:text-amber-400" />
             Vista Lateral del Palet (Alzado)
           </h3>
           {result.layersCount > 0 ? (
@@ -1843,9 +1843,9 @@ export default function CubicajeModule({ distributionList = [] }: CubicajeModule
 
         {/* ─── Comparator (if active) ─── */}
         {showComparator && compareResult && (
-          <section className="bg-zinc-900 rounded-xl border border-indigo-500/30 p-5">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-              <ArrowLeftRight className="w-4 h-4 text-indigo-400" />
+          <section className="bg-white dark:bg-zinc-900 rounded-xl border border-indigo-200 dark:border-indigo-500/30 p-5 shadow-sm">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+              <ArrowLeftRight className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
               Comparador: {palletType === 'european' ? '🇪🇺 Europeo' : '🇺🇸 Americano'} vs {comparePalletType === 'european' ? '🇪🇺 Europeo' : '🇺🇸 Americano'}
             </h3>
 
